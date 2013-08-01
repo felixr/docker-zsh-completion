@@ -1,0 +1,100 @@
+#compdef docker 
+#
+# zsh completion for docker (http://docker.io)
+#
+# version:  0.1.0
+# author:   Felix Riedel
+# license:  BSD License
+# github:   https://github.com/felixr/docker-zsh-completion
+#
+
+__parse_docker_list() {
+    sed -e '1d' -e 's/[ ]\{2,\}/|/g' -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' | awk ' BEGIN {FS="|"} { printf("%s:%7s, %s\n", $1, $4, $2)}'
+}
+
+__docker_stoppedcontainers() {
+    local expl
+    declare -a stoppedcontainers 
+    stoppedcontainers=(${(f)"$(docker ps -a | grep --color=never 'Exit' |  __parse_docker_list )"})
+    _describe -t containers-stopped "Stopped Containers" stoppedcontainers 
+}
+
+__docker_runningcontainers() {
+    local expl
+    declare -a containers 
+
+    containers=(${(f)"$(docker ps | __parse_docker_list)"})
+    _describe -t containers-active "Running Containers" containers 
+}
+
+__docker_containers () {
+    __docker_stoppedcontainers 
+    __docker_runningcontainers
+}
+
+
+_docker () {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments '*:: :->command'
+
+    if (( CURRENT == 1 )); then
+        local -a  _subcommands
+        _subcommands=(${${(f)"$(_call_program commands 
+        docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
+        _describe -t docker-commands "docker command" _subcommands
+        return
+    fi
+
+    local -a _command_args
+    case "$words[1]" in
+        attach|wait)
+            _arguments ':containers:__docker_runningcontainers'
+            ;;
+        diff|export|logs)
+            _arguments '*:containers:__docker_containers'
+            ;;
+        inspect)
+            _arguments '*:containers:__docker_containers'
+            ;;
+        insert)
+            _arguments '1:containers:__docker_containers' \
+                       '2:URL:(http:// file://)' \
+                       '3:file:_files'
+            ;;
+        kill)
+            _arguments '*:containers:__docker_runningcontainers'
+            ;;
+        port)
+            _arguments '1:containers:__docker_runningcontainers'
+            ;;
+        start)
+            _arguments '*:containers:__docker_stoppedcontainers'
+            ;;
+        rm)
+            _arguments '-v[Remove the volumes associated to the container]' \
+                '*:containers:__docker_stoppedcontainers'
+            ;;
+        top)
+            _arguments '1:containers:__docker_runningcontainers'
+            ;;
+        restart|stop)
+            _arguments '-t=-[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)' \
+                '*:containers:__docker_runningcontainers'
+            ;;
+        top)
+            _arguments ':containers:__docker_runningcontainers'
+            ;;
+        ps)
+            _arguments '-a[Show all containers. Only running containers are shown by default]' \
+                '-h[Show help]' \
+                '-beforeId=-[Show only container created before Id, include non-running one]:containers:__docker_containers' \
+            '-n=-[Show n last created containers, include non-running one]:n:(1 5 10 25 50)'
+
+            ;;
+    esac
+
+}
+
+_docker "$@"
