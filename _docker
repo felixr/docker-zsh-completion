@@ -32,69 +32,137 @@ __docker_containers () {
     __docker_runningcontainers
 }
 
+__docker_images () {
+    local expl
+    declare -a images
+    images=(${(f)"$(docker images | sed '1d' | awk '{printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    _describe -t docker-images "Images" images
+}
+
+__docker_tags() {
+    local expl
+    declare -a tags
+    tags=(${(f)"$(docker images | sed '1d' | awk '{print $2}'| sort | uniq)"})
+    _describe -t docker-tags "tags" tags
+}
+
+__docker_repositories () {
+    local expl
+    declare -a repos
+    repos=(${(f)"$(docker images | sed -e '1d' -e 's/[ ].*//' | sort | uniq)"})
+    _describe -t docker-repos "Repositories" repos
+}
+
+__docker_commands () {
+        local -a  _subcommands
+        _subcommands=(${${(f)"$(_call_program commands 
+        docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
+        _describe -t docker-commands "docker command" _subcommands
+}
+
+__docker_subcommand () {
+    local -a _command_args
+    case "$words[1]" in
+        (attach|wait)
+            _arguments ':containers:__docker_runningcontainers'
+            ;;
+        (diff|export|logs)
+            _arguments '*:containers:__docker_containers'
+            ;;
+        (inspect)
+            _arguments '*:containers:__docker_containers'
+            ;;
+        (insert)
+            _arguments '1:containers:__docker_containers' \
+                       '2:URL:(http:// file://)' \
+                       '3:file:_files'
+            ;;
+        (kill)
+            _arguments '*:containers:__docker_runningcontainers'
+            ;;
+        (port)
+            _arguments '1:containers:__docker_runningcontainers'
+            ;;
+        (start)
+            _arguments '*:containers:__docker_stoppedcontainers'
+            ;;
+        (rm)
+            _arguments '-v[Remove the volumes associated to the container]' \
+                '*:containers:__docker_stoppedcontainers'
+            ;;
+        (rmi)
+            _arguments '-v[Remove the volumes associated to the container]' \
+                '*:images:__docker_images'
+            ;;
+        (top)
+            _arguments '1:containers:__docker_runningcontainers'
+            ;;
+        (restart|stop)
+            _arguments '-t=-[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)' \
+                '*:containers:__docker_runningcontainers'
+            ;;
+        (top)
+            _arguments ':containers:__docker_runningcontainers'
+            ;;
+        (ps)
+            _arguments '-a[Show all containers. Only running containers are shown by default]' \
+                '-h[Show help]' \
+                '-beforeId=-[Show only container created before Id, include non-running one]:containers:__docker_containers' \
+            '-n=-[Show n last created containers, include non-running one]:n:(1 5 10 25 50)'
+            ;;
+        (tag)
+            _arguments \
+                '-f[force]'\
+                ':image:__docker_images'\
+                ':repository:__docker_repositories' \
+                ':tag:__docker_tags'
+            ;;
+        (run)
+            _arguments \
+                '-a=-[Attach to stdin, stdout or stderr]' \
+                '-c=-[CPU shares (relative weight)]' \
+                '-d [Detached mode: leave the container running in the background]' \
+                '-dns=[Set custom dns servers]' \
+                '-e=[Set environment variables]' \
+                '-entrypoint=-[Overwrite the default entrypoint of the image]' \
+                '-h=-[Container host name]' \
+                '-i[Keep stdin open even if not attached]' \
+                '-m=-[Memory limit (in bytes)]' \
+                '-p=-[Expose a container''s port to the host]' \
+                '-t[Allocate a pseudo-tty]' \
+                '-u=-[Username or UID]' \
+                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]'\
+                '-volumes-from=-[Mount volumes from the specified container]' \
+                '(-):images:__docker_images' \
+                ':command:(/bin/bash /usr/bin/supervisord)'
+                ;;
+        (*)
+            _message 'Unknown sub command'
+    esac
+
+}
 
 _docker () {
     local curcontext="$curcontext" state line
     typeset -A opt_args
 
-    _arguments '*:: :->command'
+    _arguments -C \
+      '-H=-[tcp://host:port to bind/connect to]' \
+         '(-): :->command' \
+         '(-)*:: :->option-or-argument' 
 
     if (( CURRENT == 1 )); then
-        local -a  _subcommands
-        _subcommands=(${${(f)"$(_call_program commands 
-        docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
-        _describe -t docker-commands "docker command" _subcommands
-        return
+
     fi
-
-    local -a _command_args
-    case "$words[1]" in
-        attach|wait)
-            _arguments ':containers:__docker_runningcontainers'
+    case $state in 
+        (command)
+            __docker_commands
             ;;
-        diff|export|logs)
-            _arguments '*:containers:__docker_containers'
-            ;;
-        inspect)
-            _arguments '*:containers:__docker_containers'
-            ;;
-        insert)
-            _arguments '1:containers:__docker_containers' \
-                       '2:URL:(http:// file://)' \
-                       '3:file:_files'
-            ;;
-        kill)
-            _arguments '*:containers:__docker_runningcontainers'
-            ;;
-        port)
-            _arguments '1:containers:__docker_runningcontainers'
-            ;;
-        start)
-            _arguments '*:containers:__docker_stoppedcontainers'
-            ;;
-        rm)
-            _arguments '-v[Remove the volumes associated to the container]' \
-                '*:containers:__docker_stoppedcontainers'
-            ;;
-        top)
-            _arguments '1:containers:__docker_runningcontainers'
-            ;;
-        restart|stop)
-            _arguments '-t=-[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)' \
-                '*:containers:__docker_runningcontainers'
-            ;;
-        top)
-            _arguments ':containers:__docker_runningcontainers'
-            ;;
-        ps)
-            _arguments '-a[Show all containers. Only running containers are shown by default]' \
-                '-h[Show help]' \
-                '-beforeId=-[Show only container created before Id, include non-running one]:containers:__docker_containers' \
-            '-n=-[Show n last created containers, include non-running one]:n:(1 5 10 25 50)'
-
+        (option-or-argument)
+            curcontext=${curcontext%:*:*}:docker-$words[1]:
+            __docker_subcommand 
             ;;
     esac
-
 }
 
 _docker "$@"
