@@ -2,7 +2,7 @@
 #
 # zsh completion for docker (http://docker.io)
 #
-# version:  0.1.0
+# version:  0.2.0
 # author:   Felix Riedel
 # license:  BSD License
 # github:   https://github.com/felixr/docker-zsh-completion
@@ -35,16 +35,47 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(docker images | sed '1d' | awk '{printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${(f)"$(docker images | awk '(NR>1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
     _describe -t docker-images "Images" images
 }
 
 __docker_tags() {
     local expl
     declare -a tags
-    tags=(${(f)"$(docker images | sed '1d' | awk '{print $2}'| sort | uniq)"})
+    tags=(${(f)"$(docker images | awk '(NR>1){print $2}'| sort | uniq)"})
     _describe -t docker-tags "tags" tags
 }
+
+__docker_search() {
+    # declare -a dockersearch
+    local cache_policy
+    zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
+    if [[ -z "$cache_policy" ]]; then
+        zstyle ":completion:${curcontext}:" cache-policy __docker_caching_policy 
+    fi
+
+    local searchterm cachename
+    searchterm="${words[$CURRENT]%/}"
+    cachename=_docker-search-$searchterm
+
+    local expl
+    local -a result 
+    if ( [[ ${(P)+cachename} -eq 0 ]] || _cache_invalid ${cachename#_} ) \
+        && ! _retrieve_cache ${cachename#_}; then
+        _message "Searching for ${searchterm}..."
+        result=(${(f)"$(docker search ${searchterm} | awk '(NR>2){print $1}')"})
+        _store_cache ${cachename#_} result
+    fi 
+    _wanted dockersearch expl 'Available images' compadd -a result 
+}
+
+__docker_caching_policy()
+{
+  # oldp=( "$1"(Nmh+24) )     # 24 hour
+  oldp=( "$1"(Nmh+1) )     # 24 hour
+  (( $#oldp ))
+}
+
 
 __docker_repositories () {
     local expl
@@ -54,10 +85,23 @@ __docker_repositories () {
 }
 
 __docker_commands () {
-        local -a  _subcommands
-        _subcommands=(${${(f)"$(_call_program commands 
+    # local -a  _docker_subcommands
+    local cache_policy
+
+    zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
+    if [[ -z "$cache_policy" ]]; then
+        zstyle ":completion:${curcontext}:" cache-policy __docker_caching_policy 
+    fi
+
+    if ( [[ ${+_docker_subcommands} -eq 0 ]] || _cache_invalid docker_subcommands) \
+        && ! _retrieve_cache docker_subcommands; 
+    then
+        _docker_subcommands=(${${(f)"$(_call_program commands 
         docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
-        _describe -t docker-commands "docker command" _subcommands
+        _store_cache docker_subcommands _docker_subcommands
+    fi
+
+    _describe -t docker-commands "docker command" _docker_subcommands
 }
 
 __docker_subcommand () {
@@ -71,6 +115,9 @@ __docker_subcommand () {
             ;;
         (inspect)
             _arguments '*:containers:__docker_containers'
+            ;;
+        (history)
+            _arguments ':images:__docker_images'
             ;;
         (insert)
             _arguments '1:containers:__docker_containers' \
@@ -136,6 +183,9 @@ __docker_subcommand () {
                 '(-):images:__docker_images' \
                 ':command:(/bin/bash /usr/bin/supervisord)'
                 ;;
+        (pull|search)
+            _arguments ':name:__docker_search'
+            ;;
         (*)
             _message 'Unknown sub command'
     esac
