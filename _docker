@@ -68,6 +68,12 @@ __docker_subcommand () {
         (attach|wait)
             _arguments ':containers:__docker_runningcontainers'
             ;;
+        (commit)
+            _arguments \
+                ':container:__docker_containers' \
+                ':repository:__docker_repositories' \
+                ':tag: '
+            ;;
         (diff|export|logs)
             _arguments '*:containers:__docker_containers'
             ;;
