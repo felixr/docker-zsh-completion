@@ -107,6 +107,9 @@ __docker_subcommand () {
             _arguments '-v[Remove the volumes associated to the container]' \
                 '*:images:__docker_images'
             ;;
+        (search)
+            _arguments '*:search term: '
+            ;;
         (top)
             _arguments '1:containers:__docker_runningcontainers'
             ;;
