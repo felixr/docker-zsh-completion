@@ -122,13 +122,13 @@ __docker_subcommand () {
                 '-a=-[Attach to stdin, stdout or stderr]:toggle:(true false)' \
                 '-c=-[CPU shares (relative weight)]:CPU shares: ' \
                 '-d [Detached mode: leave the container running in the background]' \
-                '-dns=[Set custom dns servers]:dns servers: ' \
-                '-e=[Set environment variables]:environment variables: ' \
+                '*-dns=[Set custom dns servers]:dns server: ' \
+                '*-e=[Set environment variables]:environment variable: ' \
                 '-entrypoint=-[Overwrite the default entrypoint of the image]:entry point: ' \
                 '-h=-[Container host name]:hostname:_hosts' \
                 '-i[Keep stdin open even if not attached]' \
                 '-m=-[Memory limit (in bytes)]:limit: ' \
-                '-p=-[Expose a container''s port to the host]:port:_ports' \
+                '*-p=-[Expose a container''s port to the host]:port:_ports' \
                 '-t=-[Allocate a pseudo-tty]:toggle:(true false)' \
                 '-u=-[Username or UID]:_users' \
                 '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]:volume: '\
