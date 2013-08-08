@@ -35,7 +35,8 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(docker images | awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${(f)"$(docker images | awk '(NR > 1){printf("%s\\:%s\n", $1,$2)}')"})
+    images=($images ${(f)"$(docker images | awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
     _describe -t docker-images "Images" images
 }
 
