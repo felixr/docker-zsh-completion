@@ -119,22 +119,23 @@ __docker_subcommand () {
             ;;
         (run)
             _arguments \
-                '-a=-[Attach to stdin, stdout or stderr]' \
-                '-c=-[CPU shares (relative weight)]' \
+                '-a=-[Attach to stdin, stdout or stderr]:toggle:(true false)' \
+                '-c=-[CPU shares (relative weight)]:CPU shares: ' \
                 '-d [Detached mode: leave the container running in the background]' \
-                '-dns=[Set custom dns servers]' \
-                '-e=[Set environment variables]' \
-                '-entrypoint=-[Overwrite the default entrypoint of the image]' \
-                '-h=-[Container host name]' \
+                '-dns=[Set custom dns servers]:dns servers: ' \
+                '-e=[Set environment variables]:environment variables: ' \
+                '-entrypoint=-[Overwrite the default entrypoint of the image]:entry point: ' \
+                '-h=-[Container host name]:hostname:_hosts' \
                 '-i[Keep stdin open even if not attached]' \
-                '-m=-[Memory limit (in bytes)]' \
-                '-p=-[Expose a container''s port to the host]' \
-                '-t[Allocate a pseudo-tty]' \
-                '-u=-[Username or UID]' \
-                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]'\
-                '-volumes-from=-[Mount volumes from the specified container]' \
+                '-m=-[Memory limit (in bytes)]:limit: ' \
+                '-p=-[Expose a container''s port to the host]:port:_ports' \
+                '-t=-[Allocate a pseudo-tty]:toggle:(true false)' \
+                '-u=-[Username or UID]:_users' \
+                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]:volume: '\
+                '-volumes-from=-[Mount volumes from the specified container]:volume: ' \
                 '(-):images:__docker_images' \
-                ':command:(/bin/bash /usr/bin/supervisord)'
+                '(-):command: _command_names -e' \
+                '*::arguments: _normal'
                 ;;
         (*)
             _message 'Unknown sub command'
