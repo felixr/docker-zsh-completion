@@ -35,14 +35,14 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(docker images | sed '1d' | awk '{printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${(f)"$(docker images | awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
     _describe -t docker-images "Images" images
 }
 
 __docker_tags() {
     local expl
     declare -a tags
-    tags=(${(f)"$(docker images | sed '1d' | awk '{print $2}'| sort | uniq)"})
+    tags=(${(f)"$(docker images | awk '(NR >1){print $2}'| sort | uniq)"})
     _describe -t docker-tags "tags" tags
 }
 
