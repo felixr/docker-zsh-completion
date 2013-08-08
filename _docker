@@ -35,14 +35,15 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(docker images | sed '1d' | awk '{printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${(f)"$(docker images | awk '(NR > 1){printf("%s\\:%s\n", $1,$2)}')"})
+    images=($images ${(f)"$(docker images | awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
     _describe -t docker-images "Images" images
 }
 
 __docker_tags() {
     local expl
     declare -a tags
-    tags=(${(f)"$(docker images | sed '1d' | awk '{print $2}'| sort | uniq)"})
+    tags=(${(f)"$(docker images | awk '(NR >1){print $2}'| sort | uniq)"})
     _describe -t docker-tags "tags" tags
 }
 
@@ -57,6 +58,7 @@ __docker_commands () {
         local -a  _subcommands
         _subcommands=(${${(f)"$(_call_program commands 
         docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
+        _subcommands=($_subcommands help)
         _describe -t docker-commands "docker command" _subcommands
 }
 
@@ -66,8 +68,24 @@ __docker_subcommand () {
         (attach|wait)
             _arguments ':containers:__docker_runningcontainers'
             ;;
+        (build)
+            _arguments \
+                '-t=-:repository:__docker_repositories' \
+                ':path or URL:_directories'
+            ;;
+        (commit)
+            _arguments \
+                ':container:__docker_containers' \
+                ':repository:__docker_repositories' \
+                ':tag: '
+            ;;
         (diff|export|logs)
             _arguments '*:containers:__docker_containers'
+            ;;
+        (images)
+            _arguments \
+                '-a[Show all images]' \
+                ':repository:__docker_repositories'
             ;;
         (inspect)
             _arguments '*:containers:__docker_containers'
@@ -94,6 +112,9 @@ __docker_subcommand () {
             _arguments '-v[Remove the volumes associated to the container]' \
                 '*:images:__docker_images'
             ;;
+        (search)
+            _arguments '*:search term: '
+            ;;
         (top)
             _arguments '1:containers:__docker_runningcontainers'
             ;;
@@ -119,23 +140,27 @@ __docker_subcommand () {
             ;;
         (run)
             _arguments \
-                '-a=-[Attach to stdin, stdout or stderr]' \
-                '-c=-[CPU shares (relative weight)]' \
-                '-d [Detached mode: leave the container running in the background]' \
-                '-dns=[Set custom dns servers]' \
-                '-e=[Set environment variables]' \
-                '-entrypoint=-[Overwrite the default entrypoint of the image]' \
-                '-h=-[Container host name]' \
+                '-a=-[Attach to stdin, stdout or stderr]:toggle:(true false)' \
+                '-c=-[CPU shares (relative weight)]:CPU shares: ' \
+                '-d[Detached mode: leave the container running in the background]' \
+                '*-dns=[Set custom dns servers]:dns server: ' \
+                '*-e=[Set environment variables]:environment variable: ' \
+                '-entrypoint=-[Overwrite the default entrypoint of the image]:entry point: ' \
+                '-h=-[Container host name]:hostname:_hosts' \
                 '-i[Keep stdin open even if not attached]' \
-                '-m=-[Memory limit (in bytes)]' \
-                '-p=-[Expose a container''s port to the host]' \
-                '-t[Allocate a pseudo-tty]' \
-                '-u=-[Username or UID]' \
-                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]'\
-                '-volumes-from=-[Mount volumes from the specified container]' \
+                '-m=-[Memory limit (in bytes)]:limit: ' \
+                '*-p=-[Expose a container''s port to the host]:port:_ports' \
+                '-t=-[Allocate a pseudo-tty]:toggle:(true false)' \
+                '-u=-[Username or UID]:user:_users' \
+                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]:volume: '\
+                '-volumes-from=-[Mount volumes from the specified container]:volume: ' \
                 '(-):images:__docker_images' \
-                ':command:(/bin/bash /usr/bin/supervisord)'
+                '(-):command: _command_names -e' \
+                '*::arguments: _normal'
                 ;;
+        (help)
+            _arguments ':subcommand:__docker_commands'
+            ;;
         (*)
             _message 'Unknown sub command'
     esac
@@ -147,7 +172,7 @@ _docker () {
     typeset -A opt_args
 
     _arguments -C \
-      '-H=-[tcp://host:port to bind/connect to]' \
+      '-H=-[tcp://host:port to bind/connect to]:socket: ' \
          '(-): :->command' \
          '(-)*:: :->option-or-argument' 
 
