@@ -68,6 +68,11 @@ __docker_subcommand () {
         (attach|wait)
             _arguments ':containers:__docker_runningcontainers'
             ;;
+        (build)
+            _arguments \
+                '-t=-:repository:__docker_repositories' \
+                ':path or URL:_directories'
+            ;;
         (commit)
             _arguments \
                 ':container:__docker_containers' \
