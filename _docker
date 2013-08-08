@@ -147,7 +147,7 @@ _docker () {
     typeset -A opt_args
 
     _arguments -C \
-      '-H=-[tcp://host:port to bind/connect to]' \
+      '-H=-[tcp://host:port to bind/connect to]:socket: ' \
          '(-): :->command' \
          '(-)*:: :->option-or-argument' 
 
