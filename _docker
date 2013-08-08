@@ -143,7 +143,7 @@ __docker_subcommand () {
                 '-m=-[Memory limit (in bytes)]:limit: ' \
                 '*-p=-[Expose a container''s port to the host]:port:_ports' \
                 '-t=-[Allocate a pseudo-tty]:toggle:(true false)' \
-                '-u=-[Username or UID]:_users' \
+                '-u=-[Username or UID]:user:_users' \
                 '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]:volume: '\
                 '-volumes-from=-[Mount volumes from the specified container]:volume: ' \
                 '(-):images:__docker_images' \
