@@ -70,6 +70,11 @@ __docker_subcommand () {
         (diff|export|logs)
             _arguments '*:containers:__docker_containers'
             ;;
+        (images)
+            _arguments \
+                '-a[Show all images]' \
+                ':repository:__docker_repositories'
+            ;;
         (inspect)
             _arguments '*:containers:__docker_containers'
             ;;
