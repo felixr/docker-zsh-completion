@@ -2,7 +2,7 @@
 #
 # zsh completion for docker (http://docker.io)
 #
-# version:  0.2.0
+# version:  0.2.1
 # author:   Felix Riedel
 # license:  BSD License
 # github:   https://github.com/felixr/docker-zsh-completion
@@ -35,7 +35,8 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(docker images | awk '(NR>1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${(f)"$(docker images | awk '(NR > 1){printf("%s\\:%s\n", $1,$2)}')"})
+    images=($images ${(f)"$(docker images | awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
     _describe -t docker-images "Images" images
 }
 
@@ -98,9 +99,9 @@ __docker_commands () {
     then
         _docker_subcommands=(${${(f)"$(_call_program commands 
         docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
+        _docker_subcommands=($_docker_subcommands 'help:Show help for a command') 
         _store_cache docker_subcommands _docker_subcommands
     fi
-
     _describe -t docker-commands "docker command" _docker_subcommands
 }
 
@@ -110,8 +111,24 @@ __docker_subcommand () {
         (attach|wait)
             _arguments ':containers:__docker_runningcontainers'
             ;;
+        (build)
+            _arguments \
+                '-t=-:repository:__docker_repositories' \
+                ':path or URL:_directories'
+            ;;
+        (commit)
+            _arguments \
+                ':container:__docker_containers' \
+                ':repository:__docker_repositories' \
+                ':tag: '
+            ;;
         (diff|export|logs)
             _arguments '*:containers:__docker_containers'
+            ;;
+        (images)
+            _arguments \
+                '-a[Show all images]' \
+                ':repository:__docker_repositories'
             ;;
         (inspect)
             _arguments '*:containers:__docker_containers'
@@ -166,25 +183,29 @@ __docker_subcommand () {
             ;;
         (run)
             _arguments \
-                '-a=-[Attach to stdin, stdout or stderr]' \
-                '-c=-[CPU shares (relative weight)]' \
-                '-d [Detached mode: leave the container running in the background]' \
-                '-dns=[Set custom dns servers]' \
-                '-e=[Set environment variables]' \
-                '-entrypoint=-[Overwrite the default entrypoint of the image]' \
-                '-h=-[Container host name]' \
+                '-a=-[Attach to stdin, stdout or stderr]:toggle:(true false)' \
+                '-c=-[CPU shares (relative weight)]:CPU shares: ' \
+                '-d[Detached mode: leave the container running in the background]' \
+                '*-dns=[Set custom dns servers]:dns server: ' \
+                '*-e=[Set environment variables]:environment variable: ' \
+                '-entrypoint=-[Overwrite the default entrypoint of the image]:entry point: ' \
+                '-h=-[Container host name]:hostname:_hosts' \
                 '-i[Keep stdin open even if not attached]' \
-                '-m=-[Memory limit (in bytes)]' \
-                '-p=-[Expose a container''s port to the host]' \
-                '-t[Allocate a pseudo-tty]' \
-                '-u=-[Username or UID]' \
-                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]'\
-                '-volumes-from=-[Mount volumes from the specified container]' \
+                '-m=-[Memory limit (in bytes)]:limit: ' \
+                '*-p=-[Expose a container''s port to the host]:port:_ports' \
+                '-t=-[Allocate a pseudo-tty]:toggle:(true false)' \
+                '-u=-[Username or UID]:user:_users' \
+                '-v=-[Bind mount a volume (e.g. from the host: -v /host:/container, from docker: -v /container)]:volume: '\
+                '-volumes-from=-[Mount volumes from the specified container]:volume: ' \
                 '(-):images:__docker_images' \
-                ':command:(/bin/bash /usr/bin/supervisord)'
+                '(-):command: _command_names -e' \
+                '*::arguments: _normal'
                 ;;
         (pull|search)
             _arguments ':name:__docker_search'
+            ;;
+        (help)
+            _arguments ':subcommand:__docker_commands'
             ;;
         (*)
             _message 'Unknown sub command'
@@ -197,7 +218,7 @@ _docker () {
     typeset -A opt_args
 
     _arguments -C \
-      '-H=-[tcp://host:port to bind/connect to]' \
+      '-H=-[tcp://host:port to bind/connect to]:socket: ' \
          '(-): :->command' \
          '(-)*:: :->option-or-argument' 
 
