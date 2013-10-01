@@ -9,7 +9,7 @@
 #
 
 __parse_docker_list() {
-    sed -e '1d' -e 's/[ ]\{2,\}/|/g' -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' | awk ' BEGIN {FS="|"} { printf("%s:%7s, %s\n", $1, $4, $2)}'
+    sed -e '/^ID/d' -e 's/[ ]\{2,\}/|/g' -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' | awk ' BEGIN {FS="|"} { printf("%s:%7s, %s\n", $1, $4, $2)}'
 }
 
 __docker_stoppedcontainers() {
