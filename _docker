@@ -2,25 +2,40 @@
 #
 # zsh completion for docker (http://docker.io)
 #
-# version:  0.2.2
+# version:  0.2.3
 # author:   Felix Riedel
 # license:  BSD License
 # github:   https://github.com/felixr/docker-zsh-completion
 #
 
 __parse_docker_list() {
-    sed -e '1d' \
-        -e 's/[ ]\{2,\}/|/g' \
-        -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' | \
-        awk 'BEGIN {FS="|"}
-           '"$1"' { printf("%s:%7s, %s\n", $1, $4, $2) }
-           '"$1"' { if ($7 != "") printf("%s:%7s, %s\n", $7, $4, $2) }'
+        awk '
+NR == 1 { 
+    idx=1;i=0;f[i]=0
+    header=$0
+    while ( match(header, /  ([A-Z]+|[A-Z]+ [A-Z]+)/) ) {
+        idx += RSTART+1
+        f[++i]=idx
+        header = substr($0,idx)
+    }
+    f[++i]=999
+}
+
+NR > 1 '"$1"' {
+    for(j=0;j<i;j++) {
+        x[j] = substr($0, f[j], f[j+1]-f[j]-1)
+        gsub(/[ ]+$/, "", x[j])
+    }
+    printf("%s:%7s, %s\n", x[0], x[3], x[1])
+    if (x[6] != "") printf("%s:%7s, %s\n", x[6], x[3], x[1])
+    }
+'| sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' 
 }
 
 __docker_stoppedcontainers() {
     local expl
     declare -a stoppedcontainers 
-    stoppedcontainers=(${(f)"$(docker ps -a |  __parse_docker_list '($5 ~ /^Exit/)')"})
+    stoppedcontainers=(${(f)"$(docker ps -a |  __parse_docker_list '&& / Exit/')"})
     _describe -t containers-stopped "Stopped Containers" stoppedcontainers 
 }
 
