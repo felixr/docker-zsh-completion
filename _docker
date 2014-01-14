@@ -27,8 +27,11 @@ NR > 1 '"$1"' {
         gsub(/[ ]+$/, "", x[j])
     }
     printf("%s:%7s, %s\n", x[0], x[3], x[1])
-    if (x[6] != "") printf("%s:%7s, %s\n", x[6], x[3], x[1])
+    if (x[6] != "") {
+       split(x[6], names, /,/)
+       for (name in names) printf("%s:%7s, %s\n", names[name], x[3], x[1])
     }
+}
 '| sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' 
 }
 
