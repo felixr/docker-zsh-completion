@@ -246,7 +246,7 @@ __docker_subcommand () {
                 '*:containers:__docker_stoppedcontainers'
             ;;
         (rmi)
-            _arguments '-v[Remove the volumes associated to the container]' \
+            _arguments \
                 '*:images:__docker_images'
             ;;
         (top)
