@@ -36,7 +36,7 @@ __docker_stoppedcontainers() {
     local expl
     declare -a stoppedcontainers 
     stoppedcontainers=(${(f)"$(docker ps -a |  __parse_docker_list '&& / Exit/')"})
-    _describe -t containers-stopped "Stopped Containers" stoppedcontainers 
+    _describe -t containers-stopped "Stopped Containers" stoppedcontainers "$@"
 }
 
 __docker_runningcontainers() {
@@ -44,12 +44,12 @@ __docker_runningcontainers() {
     declare -a containers 
 
     containers=(${(f)"$(docker ps | __parse_docker_list)"})
-    _describe -t containers-active "Running Containers" containers 
+    _describe -t containers-active "Running Containers" containers "$@"
 }
 
 __docker_containers () {
-    __docker_stoppedcontainers 
-    __docker_runningcontainers
+    __docker_stoppedcontainers "$@"
+    __docker_runningcontainers "$@"
 }
 
 __docker_images () {
@@ -157,6 +157,20 @@ __docker_subcommand () {
                 '-run=-[Configuration automatically applied when the image is run]:configuration: ' \
                 ':container:__docker_containers' \
                 ':repository:__docker_repositories_with_tags'
+            ;;
+        (cp)
+            _arguments \
+                ':container:->container' \
+                ':hostpath:_files'
+            case $state in
+                (container)
+                    if compset -P '*:'; then
+                        _files
+                    else
+                        __docker_containers -qS ":"
+                    fi
+                    ;;
+            esac
             ;;
         (diff|export|logs)
             _arguments '*:containers:__docker_containers'
