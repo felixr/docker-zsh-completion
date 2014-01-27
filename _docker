@@ -133,6 +133,9 @@ __docker_subcommand () {
             ;;
         (build)
             _arguments \
+                '-no-cache[Do not use cache when building the image]' \
+                '-q[Suppress verbose build output]' \
+                '-rm[Remove intermediate containers after a successful build]' \
                 '-t=-:repository:__docker_repositories' \
                 ':path or URL:_directories'
             ;;
