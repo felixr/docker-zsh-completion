@@ -240,7 +240,9 @@ __docker_subcommand () {
             _arguments '*:containers:__docker_stoppedcontainers'
             ;;
         (rm)
-            _arguments '-v[Remove the volumes associated to the container]' \
+            _arguments \
+                '-link[Remove the specified link and not the underlying container]' \
+                '-v[Remove the volumes associated to the container]' \
                 '*:containers:__docker_stoppedcontainers'
             ;;
         (rmi)
