@@ -128,8 +128,11 @@ __docker_commands () {
 __docker_subcommand () {
     local -a _command_args
     case "$words[1]" in
-        (attach|wait)
-            _arguments ':containers:__docker_runningcontainers'
+        (attach)
+            _arguments \
+                '-nostdin[Do not attach stdin]' \
+                '-sig-proxy[Proxify all received signal]' \
+                ':containers:__docker_runningcontainers'
             ;;
         (build)
             _arguments \
@@ -230,6 +233,9 @@ __docker_subcommand () {
                 ;;
         (pull|search)
             _arguments ':name:__docker_search'
+            ;;
+        (wait)
+            _arguments ':containers:__docker_runningcontainers'
             ;;
         (help)
             _arguments ':subcommand:__docker_commands'
