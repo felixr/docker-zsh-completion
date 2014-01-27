@@ -184,6 +184,10 @@ __docker_subcommand () {
         (images)
             _arguments \
                 '-a[Show all images]' \
+                '-notrunc[Do not truncate output]' \
+                '-q[Only show numeric IDs]' \
+                '-tree[Output graph in tree format]' \
+                '-viz[Output graph in graphviz format]' \
                 ':repository:__docker_repositories'
             ;;
         (inspect)
