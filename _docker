@@ -172,7 +172,7 @@ __docker_subcommand () {
                     ;;
             esac
             ;;
-        (diff|export|logs)
+        (diff|export)
             _arguments '*:containers:__docker_containers'
             ;;
         (history)
@@ -196,6 +196,11 @@ __docker_subcommand () {
             ;;
         (kill)
             _arguments '*:containers:__docker_runningcontainers'
+            ;;
+        (logs)
+            _arguments \
+                '-f[Follow log output]' \
+                '*:containers:__docker_containers'
             ;;
         (port)
             _arguments '1:containers:__docker_runningcontainers'
