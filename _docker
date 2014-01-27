@@ -324,6 +324,10 @@ __docker_subcommand () {
         (push)
             _arguments ':repository:__docker_repositories_with_tags'
             ;;
+        (save)
+            _arguments \
+                ':images:__docker_images'
+            ;;
         (wait)
             _arguments ':containers:__docker_runningcontainers'
             ;;
