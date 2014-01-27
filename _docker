@@ -219,6 +219,13 @@ __docker_subcommand () {
             ;;
         (load)
             ;;
+        (login)
+            _arguments \
+                '-e=-[Email]:email: ' \
+                '-p=-[Password]:password: ' \
+                '-u=-[Username]:username: ' \
+                ':server: '
+            ;;
         (logs)
             _arguments \
                 '-f[Follow log output]' \
