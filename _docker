@@ -176,7 +176,10 @@ __docker_subcommand () {
             _arguments '*:containers:__docker_containers'
             ;;
         (history)
-            _arguments '*:images:__docker_images'
+            _arguments \
+                '-notrunc[Do not truncate output]' \
+                '-q[Only show numeric IDs]' \
+                '*:images:__docker_images'
             ;;
         (images)
             _arguments \
@@ -186,8 +189,12 @@ __docker_subcommand () {
         (inspect)
             _arguments '*:containers:__docker_containers'
             ;;
-        (history)
-            _arguments ':images:__docker_images'
+        (import)
+            _arguments \
+                ':URL:(- http:// file://)' \
+                ':repository:__docker_repositories_with_tags'
+            ;;
+        (info)
             ;;
         (insert)
             _arguments '1:containers:__docker_containers' \
