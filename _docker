@@ -299,6 +299,9 @@ __docker_subcommand () {
         (pull|search)
             _arguments ':name:__docker_search'
             ;;
+        (push)
+            _arguments ':repository:__docker_repositories_with_tags'
+            ;;
         (wait)
             _arguments ':containers:__docker_runningcontainers'
             ;;
