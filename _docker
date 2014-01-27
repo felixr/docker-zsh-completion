@@ -200,6 +200,13 @@ __docker_subcommand () {
             ;;
         (info)
             ;;
+        (import)
+            _arguments \
+                ':URL:(- http:// file://)' \
+                ':repository:__docker_repositories_with_tags'
+            ;;
+        (info)
+            ;;
         (insert)
             _arguments '1:containers:__docker_containers' \
                        '2:URL:(http:// file://)' \
