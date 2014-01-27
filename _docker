@@ -191,7 +191,9 @@ __docker_subcommand () {
                 ':repository:__docker_repositories'
             ;;
         (inspect)
-            _arguments '*:containers:__docker_containers'
+            _arguments \
+                '-format=-[Format the output using the given go template]:template: ' \
+                '*:containers:__docker_containers'
             ;;
         (import)
             _arguments \
