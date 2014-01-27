@@ -232,7 +232,9 @@ __docker_subcommand () {
                 '*:containers:__docker_containers'
             ;;
         (port)
-            _arguments '1:containers:__docker_runningcontainers'
+            _arguments \
+                '1:containers:__docker_runningcontainers' \
+                '2:port:_ports'
             ;;
         (start)
             _arguments '*:containers:__docker_stoppedcontainers'
