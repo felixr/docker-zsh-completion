@@ -277,8 +277,7 @@ __docker_subcommand () {
             _arguments \
                 '-f[force]'\
                 ':image:__docker_images'\
-                ':repository:__docker_repositories' \
-                ':tag:__docker_tags'
+                ':repository:__docker_repositories_with_tags'
             ;;
         (run)
             _arguments \
