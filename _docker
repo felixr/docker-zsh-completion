@@ -237,7 +237,10 @@ __docker_subcommand () {
                 '2:port:_ports'
             ;;
         (start)
-            _arguments '*:containers:__docker_stoppedcontainers'
+            _arguments \
+                '-a[Attach container'"'"'s stdout/stderr and forward all signals]' \
+                '-i[Attach container'"'"'s stding]' \
+                '*:containers:__docker_stoppedcontainers'
             ;;
         (rm)
             _arguments \
