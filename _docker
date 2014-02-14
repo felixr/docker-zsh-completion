@@ -289,7 +289,15 @@ __docker_subcommand () {
                 '*:containers:__docker_runningcontainers'
             ;;
         (top)
-            _arguments ':containers:__docker_runningcontainers'
+            _arguments \
+                '1:containers:__docker_runningcontainers' \
+                '(-)*:: :->ps-arguments'
+            case $state in 
+                (ps-arguments)
+                    _ps
+                    ;;
+            esac
+
             ;;
         (ps)
             _arguments \
