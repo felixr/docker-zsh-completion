@@ -284,9 +284,6 @@ __docker_subcommand () {
             _arguments \
                 '*:images:__docker_images'
             ;;
-        (top)
-            _arguments '1:containers:__docker_runningcontainers'
-            ;;
         (restart|stop)
             _arguments '-t=-[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)' \
                 '*:containers:__docker_runningcontainers'
