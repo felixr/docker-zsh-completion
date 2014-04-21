@@ -1,19 +1,19 @@
-#compdef docker 
+#compdef docker
 #
 # zsh completion for docker (http://docker.io)
 #
 # version:  0.3.0
 # github:   https://github.com/felixr/docker-zsh-completion
 #
-# contributers:   
+# contributers:
 #   - Felix Riedel
 #   - Vincent Bernat
 #
-# license:  
+# license:
 #
 # Copyright (c) 2013, Felix Riedel
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
@@ -24,7 +24,7 @@
 #     * Neither the name of the <organization> nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,11 +35,11 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
 __parse_docker_list() {
         awk '
-NR == 1 { 
+NR == 1 {
     idx=1;i=0;f[i]=0
     header=$0
     while ( match(header, /  ([A-Z]+|[A-Z]+ [A-Z]+)/) ) {
@@ -61,19 +61,19 @@ NR > 1 '"$1"' {
        for (name in names) printf("%s:%7s, %s\n", names[name], x[3], x[1])
     }
 }
-'| sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/' 
+'| sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/'
 }
 
 __docker_stoppedcontainers() {
     local expl
-    declare -a stoppedcontainers 
+    declare -a stoppedcontainers
     stoppedcontainers=(${(f)"$(_call_program commands docker ps -a |  __parse_docker_list '&& / Exit/')"})
     _describe -t containers-stopped "Stopped Containers" stoppedcontainers "$@"
 }
 
 __docker_runningcontainers() {
     local expl
-    declare -a containers 
+    declare -a containers
 
     containers=(${(f)"$(_call_program commands docker ps | __parse_docker_list)"})
     _describe -t containers-active "Running Containers" containers "$@"
@@ -112,7 +112,7 @@ __docker_search() {
     local cache_policy
     zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
     if [[ -z "$cache_policy" ]]; then
-        zstyle ":completion:${curcontext}:" cache-policy __docker_caching_policy 
+        zstyle ":completion:${curcontext}:" cache-policy __docker_caching_policy
     fi
 
     local searchterm cachename
@@ -120,14 +120,14 @@ __docker_search() {
     cachename=_docker-search-$searchterm
 
     local expl
-    local -a result 
+    local -a result
     if ( [[ ${(P)+cachename} -eq 0 ]] || _cache_invalid ${cachename#_} ) \
         && ! _retrieve_cache ${cachename#_}; then
         _message "Searching for ${searchterm}..."
         result=(${(f)"$(_call_program commands docker search ${searchterm} | awk '(NR>2){print $1}')"})
         _store_cache ${cachename#_} result
-    fi 
-    _wanted dockersearch expl 'Available images' compadd -a result 
+    fi
+    _wanted dockersearch expl 'Available images' compadd -a result
 }
 
 __docker_caching_policy()
@@ -151,15 +151,15 @@ __docker_commands () {
 
     zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
     if [[ -z "$cache_policy" ]]; then
-        zstyle ":completion:${curcontext}:" cache-policy __docker_caching_policy 
+        zstyle ":completion:${curcontext}:" cache-policy __docker_caching_policy
     fi
 
     if ( [[ ${+_docker_subcommands} -eq 0 ]] || _cache_invalid docker_subcommands) \
-        && ! _retrieve_cache docker_subcommands; 
+        && ! _retrieve_cache docker_subcommands;
     then
-        _docker_subcommands=(${${(f)"$(_call_program commands 
+        _docker_subcommands=(${${(f)"$(_call_program commands
         docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
-        _docker_subcommands=($_docker_subcommands 'help:Show help for a command') 
+        _docker_subcommands=($_docker_subcommands 'help:Show help for a command')
         _store_cache docker_subcommands _docker_subcommands
     fi
     _describe -t docker-commands "docker command" _docker_subcommands
@@ -290,7 +290,7 @@ __docker_subcommand () {
             _arguments \
                 '1:containers:__docker_runningcontainers' \
                 '(-)*:: :->ps-arguments'
-            case $state in 
+            case $state in
                 (ps-arguments)
                     _ps
                     ;;
@@ -391,18 +391,18 @@ _docker () {
     _arguments -C \
       '-H=-[tcp://host:port to bind/connect to]:socket: ' \
          '(-): :->command' \
-         '(-)*:: :->option-or-argument' 
+         '(-)*:: :->option-or-argument'
 
     if (( CURRENT == 1 )); then
 
     fi
-    case $state in 
+    case $state in
         (command)
             __docker_commands
             ;;
         (option-or-argument)
             curcontext=${curcontext%:*:*}:docker-$words[1]:
-            __docker_subcommand 
+            __docker_subcommand
             ;;
     esac
 }
