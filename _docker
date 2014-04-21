@@ -378,6 +378,13 @@ __docker_subcommand () {
 }
 
 _docker () {
+    # Support for subservices, which allows for `compdef _docker docker-shell=_docker_containers`.
+    # Based on /usr/share/zsh/functions/Completion/Unix/_git without support for `ret`.
+    if [[ $service != docker ]]; then
+        _call_function - _$service
+        return
+    fi
+
     local curcontext="$curcontext" state line
     typeset -A opt_args
 
