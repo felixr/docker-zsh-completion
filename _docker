@@ -300,13 +300,13 @@ __docker_subcommand () {
         (ps)
             _arguments \
                 '-a[Show all containers]' \
-                '--beforeId=-[Show only container created before...]:containers:__docker_containers' \
+                '--before=-[Show only container created before...]:containers:__docker_containers' \
                 '-l[Show only the latest created container]' \
                 '-n=-[Show n last created containers, include non-running one]:n:(1 5 10 25 50)' \
                 '--no-trunc[Do not truncate output]' \
                 '-q[Only show numeric IDs]' \
                 '-s[Display sizes]' \
-                '--sinceId=-[Show only containers created since...]:containers:__docker_containers'
+                '--since=-[Show only containers created since...]:containers:__docker_containers'
             ;;
         (tag)
             _arguments \
