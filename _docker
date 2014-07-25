@@ -38,23 +38,15 @@
 #
 
 __docker_awk() {
-  if (( $+commands[gawk] )); then
-    gawk "$@"
-  else
-    awk "$@"
-  fi
+    ${commands[gawk]-awk} "$@"
 }
 
 __docker_sed() {
-  if (( $+commands[gsed] )); then
-    gsed "$@"
-  else
-    sed "$@"
-  fi
+    ${commands[gsed]-sed} "$@"
 }
 
 __parse_docker_list() {
-        __docker_awk '
+    __docker_awk '
 NR == 1 {
     idx=1;i=0;f[i]=0
     header=$0
