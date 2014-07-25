@@ -37,8 +37,24 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+__docker_awk() {
+  if (( $+commands[gawk] )); then
+    gawk "$@"
+  else
+    awk "$@"
+  fi
+}
+
+__docker_sed() {
+  if (( $+commands[gsed] )); then
+    gsed "$@"
+  else
+    sed "$@"
+  fi
+}
+
 __parse_docker_list() {
-        awk '
+        __docker_awk '
 NR == 1 {
     idx=1;i=0;f[i]=0
     header=$0
@@ -61,7 +77,7 @@ NR > 1 '"$1"' {
        for (name in names) printf("%s:%7s, %s\n", names[name], x[3], x[1])
     }
 }
-'| sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/'
+'| __docker_sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/'
 }
 
 __docker_stoppedcontainers() {
@@ -87,15 +103,15 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(_call_program commands docker images | awk '(NR > 1 && $1 != "<none>"){printf("%s", $1);if ($2 != "<none>") printf("\\:%s", $2); printf("\n")}')"})
-    images=($images ${(f)"$(_call_program commands docker images | awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${(f)"$(_call_program commands docker images | __docker_awk '(NR > 1 && $1 != "<none>"){printf("%s", $1);if ($2 != "<none>") printf("\\:%s", $2); printf("\n")}')"})
+    images=($images ${(f)"$(_call_program commands docker images | __docker_awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
     _describe -t docker-images "Images" images
 }
 
 __docker_tags() {
     local expl
     declare -a tags
-    tags=(${(f)"$(_call_program commands docker images | awk '(NR>1){print $2}'| sort | uniq)"})
+    tags=(${(f)"$(_call_program commands docker images | __docker_awk '(NR>1){print $2}'| sort | uniq)"})
     _describe -t docker-tags "tags" tags
 }
 
@@ -124,7 +140,7 @@ __docker_search() {
     if ( [[ ${(P)+cachename} -eq 0 ]] || _cache_invalid ${cachename#_} ) \
         && ! _retrieve_cache ${cachename#_}; then
         _message "Searching for ${searchterm}..."
-        result=(${(f)"$(_call_program commands docker search ${searchterm} | awk '(NR>2){print $1}')"})
+        result=(${(f)"$(_call_program commands docker search ${searchterm} | __docker_awk '(NR>2){print $1}')"})
         _store_cache ${cachename#_} result
     fi
     _wanted dockersearch expl 'Available images' compadd -a result
@@ -141,7 +157,7 @@ __docker_caching_policy()
 __docker_repositories () {
     local expl
     declare -a repos
-    repos=(${(f)"$(_call_program commands docker images | sed -e '1d' -e 's/[ ].*//' | sort | uniq)"})
+    repos=(${(f)"$(_call_program commands docker images | __docker_sed -e '1d' -e 's/[ ].*//' | sort | uniq)"})
     _describe -t docker-repos "Repositories" repos "$@"
 }
 
@@ -158,7 +174,7 @@ __docker_commands () {
         && ! _retrieve_cache docker_subcommands;
     then
         _docker_subcommands=(${${(f)"$(_call_program commands
-        docker 2>&1 | sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
+        docker 2>&1 | __docker_sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
         _docker_subcommands=($_docker_subcommands 'help:Show help for a command')
         _store_cache docker_subcommands _docker_subcommands
     fi
