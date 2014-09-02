@@ -164,8 +164,7 @@ __docker_commands () {
     if ( [[ ${+_docker_subcommands} -eq 0 ]] || _cache_invalid docker_subcommands) \
         && ! _retrieve_cache docker_subcommands;
     then
-        _docker_subcommands=(${${(f)"$(_call_program commands
-        docker 2>&1 | __docker_sed -e '1,6d' -e '/^[ ]*$/d' -e 's/[ ]*\([^ ]\+\)\s*\([^ ].*\)/\1:\2/' )"}})
+        _docker_subcommands=(${${${${(f)"$(_call_program commands docker 2>&1)"}[5,-1]}## #}/ ##/:})
         _docker_subcommands=($_docker_subcommands 'help:Show help for a command')
         _store_cache docker_subcommands _docker_subcommands
     fi
