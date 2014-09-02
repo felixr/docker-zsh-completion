@@ -110,7 +110,7 @@ __docker_images () {
     declare -a images
     images=(${${${${(f)"$(_call_program commands docker images)"}[2,-1]}/ ##/\\:}%% *})
     images=(${${images%\\:<none>}#<none>} ${${${(f)"$(_call_program commands docker images)"}[2,-1]}/(#b)([^ ]##) ##([^ ]##) ##([^ ]##)*/${match[3]}:${(r:15:: :::)match[2]} in ${match[1]}})
-    _describe -t docker-images "Images" images
+    _describe -t docker-images "images" images
 }
 
 __docker_tags() {
@@ -148,7 +148,7 @@ __docker_search() {
         result=(${${${(f)"$(_call_program commands docker search ${searchterm})"}%% *}[2,-1]})
         _store_cache ${cachename#_} result
     fi
-    _wanted dockersearch expl 'Available images' compadd -a result
+    _wanted dockersearch expl 'available images' compadd -a result
 }
 
 __docker_caching_policy()
@@ -162,7 +162,7 @@ __docker_repositories () {
     local expl
     declare -a repos
     repos=(${${${(f)"$(_call_program commands docker images)"}%% *}[2,-1]})
-    _describe -t docker-repos "Repositories" repos "$@"
+    _describe -t docker-repos "repositories" repos "$@"
 }
 
 __docker_commands () {
