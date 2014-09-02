@@ -37,59 +37,72 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__docker_awk() {
-    ${commands[gawk]-awk} "$@"
-}
+__docker_get_containers() {
+    local kind expl
+    declare -a running stopped lines args
 
-__docker_sed() {
-    ${commands[gsed]-sed} "$@"
-}
+    kind=$1
+    shift
+    [[ $kind = (stopped|all) ]] && args=($args -a)
 
-__parse_docker_list() {
-    __docker_awk '
-NR == 1 {
-    idx=1;i=0;f[i]=0
-    header=$0
-    while ( match(header, /  ([A-Z]+|[A-Z]+ [A-Z]+)/) ) {
-        idx += RSTART+1
-        f[++i]=idx
-        header = substr($0,idx)
-    }
-    f[++i]=999
-}
+    lines=(${(f)"$(_call_program commands docker ps ${args})"})
 
-NR > 1 '"$1"' {
-    for(j=0;j<i;j++) {
-        x[j] = substr($0, f[j], f[j+1]-f[j]-1)
-        gsub(/[ ]+$/, "", x[j])
+    # Parse header line to find columns
+    local i=1 j=1 k header=${lines[1]}
+    declare -A begin end
+    while (( $j < ${#header} - 1 )) {
+        i=$(( $j + ${${header[$j,-1]}[(i)[^ ]]} - 1))
+        j=$(( $i + ${${header[$i,-1]}[(i)  ]} - 1))
+        k=$(( $j + ${${header[$j,-1]}[(i)[^ ]]} - 2))
+        begin[${header[$i,$(($j-1))]}]=$i
+        end[${header[$i,$(($j-1))]}]=$k
     }
-    printf("%s:%7s, %s\n", x[0], x[3], x[1])
-    if (x[6] != "") {
-       split(x[6], names, /,/)
-       for (name in names) printf("%s:%7s, %s\n", names[name], x[3], x[1])
-    }
-}
-'| __docker_sed -e 's/ \([hdwm]\)\(inutes\|ays\|ours\|eeks\)/\1/'
+    lines=(${lines[2,-1]})
+
+    # Container ID
+    local line
+    local s
+    for line in $lines; do
+        s="${line[${begin[CONTAINER ID]},${end[CONTAINER ID]}]%% ##}"
+        s="$s:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
+        s="$s, ${${${line[$begin[IMAGE],$end[IMAGE]]}/:/\\:}%% ##}"
+        if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
+            stopped=($stopped $s)
+        else
+            running=($running $s)
+        fi
+    done
+
+    # Names
+    local name
+    local -a names
+    for line in $lines; do
+        names=(${(ps:,:)${${line[${begin[NAMES]},-1]}%% *}})
+        for name in $names; do
+            s="${name}:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
+            s="$s, ${${${line[$begin[IMAGE],$end[IMAGE]]}/:/\\:}%% ##}"
+            if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
+                stopped=($stopped $s)
+            else
+                running=($running $s)
+            fi
+        done
+    done
+
+    [[ $kind = (running|all) ]] && _describe -t containers-running "running containers" running
+    [[ $kind = (stopped|all) ]] && _describe -t containers-stopped "stopped containers" stopped
 }
 
 __docker_stoppedcontainers() {
-    local expl
-    declare -a stoppedcontainers
-    stoppedcontainers=(${(f)"$(_call_program commands docker ps -a |  __parse_docker_list '&& / Exit/')"})
-    _describe -t containers-stopped "Stopped Containers" stoppedcontainers "$@"
+    __docker_get_containers stopped "$@"
 }
 
 __docker_runningcontainers() {
-    local expl
-    declare -a containers
-
-    containers=(${(f)"$(_call_program commands docker ps | __parse_docker_list)"})
-    _describe -t containers-active "Running Containers" containers "$@"
+    __docker_get_containers running "$@"
 }
 
 __docker_containers () {
-    __docker_stoppedcontainers "$@"
-    __docker_runningcontainers "$@"
+    __docker_get_containers all "$@"
 }
 
 __docker_images () {
