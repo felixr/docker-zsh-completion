@@ -95,8 +95,8 @@ __docker_containers () {
 __docker_images () {
     local expl
     declare -a images
-    images=(${(f)"$(_call_program commands docker images | __docker_awk '(NR > 1 && $1 != "<none>"){printf("%s", $1);if ($2 != "<none>") printf("\\:%s", $2); printf("\n")}' | __docker_sed -e 's/\(\w\):/\1\\:/')"})
-    images=($images ${(f)"$(_call_program commands docker images | __docker_awk '(NR > 1){printf("%s:%-15s in %s\n", $3,$2,$1)}')"})
+    images=(${${${${(f)"$(_call_program commands docker images)"}[2,-1]}/ ##/\\:}%% *})
+    images=(${${images%\\:<none>}#<none>} ${${${(f)"$(_call_program commands docker images)"}[2,-1]}/(#b)([^ ]##) ##([^ ]##) ##([^ ]##)*/${match[3]}:${(r:15:: :::)match[2]} in ${match[1]}})
     _describe -t docker-images "Images" images
 }
 
