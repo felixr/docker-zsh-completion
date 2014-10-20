@@ -341,6 +341,10 @@ __docker_subcommand () {
                 '1:containers:__docker_runningcontainers' \
                 '2:port:_ports'
             ;;
+        (pause|unpause)
+            _arguments \
+                '1:containers:__docker_runningcontainers'
+            ;;
         (start)
             _arguments \
                 '-a[Attach container'"'"'s stdout/stderr and forward all signals]' \
