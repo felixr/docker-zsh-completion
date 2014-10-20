@@ -327,6 +327,10 @@ __docker_subcommand () {
                 '-u[Username]:username: ' \
                 ':server: '
             ;;
+        (logout)
+            _arguments \
+                ':server: '
+            ;;
         (logs)
             _arguments \
                 '-f[Follow log output]' \
