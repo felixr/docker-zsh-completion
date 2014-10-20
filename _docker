@@ -233,6 +233,13 @@ __docker_subcommand () {
                 '--since=-[Events created since this timestamp]:timestamp: ' \
                 '--until=-[Events created until this timestamp]:timestamp: '
             ;;
+        (exec)
+            _arguments \
+                {-d,--detach}'[Detached mode: leave the container running in the background]' \
+                {-i,--interactive}'[Keep stdin open even if not attached]' \
+                {-t,--tty}'[Allocate a pseudo-tty]' \
+                ':containers:__docker_runningcontainers'
+            ;;
         (history)
             _arguments \
                 '--no-trunc[Do not truncate output]' \
