@@ -273,6 +273,11 @@ __docker_subcommand () {
         (diff|export)
             _arguments '*:containers:__docker_containers'
             ;;
+        (events)
+            _arguments \
+                '--since=-[Events created since this timestamp]:timestamp: ' \
+                '--until=-[Events created until this timestamp]:timestamp: '
+            ;;
         (history)
             _arguments \
                 '--no-trunc[Do not truncate output]' \
