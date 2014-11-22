@@ -192,7 +192,7 @@ __docker_subcommand () {
         (attach)
             _arguments \
                 '--no-stdin[Do not attach stdin]' \
-                '--sig-proxy[Proxify all received signal]' \
+                '--sig-proxy[Proxy all received signals to the process (non-TTY mode only)]' \
                 ':containers:__docker_runningcontainers'
             ;;
         (build)
@@ -359,7 +359,7 @@ __docker_subcommand () {
                 '-n[Show n last created containers, include non-running one]:n:(1 5 10 25 50)' \
                 '--no-trunc[Do not truncate output]' \
                 {-q,--quiet}'[Only show numeric IDs]' \
-                {-s,--size}'[Display sizes]' \
+                {-s,--size}'[Display total file sizes]' \
                 '--since=-[Show only containers created since...]:containers:__docker_containers'
             ;;
         (tag)
