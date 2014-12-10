@@ -391,7 +391,7 @@ __docker_subcommand () {
                 '*--lxc-conf=-[Add custom lxc options]:lxc options: ' \
                 '-m[Memory limit (in bytes)]:limit: ' \
                 '--name=-[Container name]:name: ' \
-                '--net=-[Network mode]:network mode:(bridge none container: host)' \
+                '--net=-[Network mode]:network mode:(bridge none container host)' \
                 {-P,--publish-all}'[Publish all exposed ports]' \
                 '*'{-p,--publish=-}'[Expose a container'"'"'s port to the host]:port:_ports' \
                 '--privileged[Give extended privileges to this container]' \
