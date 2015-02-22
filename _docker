@@ -233,6 +233,7 @@ __docker_subcommand () {
             ;;
         (events)
             _arguments \
+                '*'{-f,--filter=-}'[Filter values]:filter: ' \
                 '--since=-[Events created since this timestamp]:timestamp: ' \
                 '--until=-[Events created until this timestamp]:timestamp: '
             ;;
