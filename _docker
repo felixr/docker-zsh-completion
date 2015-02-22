@@ -299,7 +299,7 @@ __docker_subcommand () {
             ;;
         (load)
             _arguments \
-                {-i,--input=-}'[Read from tar archive file]:tar:_files'
+                {-i,--input=-}'[Read from tar archive file]:archive file:_files -g "*.((tar|TAR)(.gz|.GZ|.Z|.bz2|.lzma|.xz|)|(tbz|tgz|txz))(-.)"'
             ;;
         (login)
             _arguments \
