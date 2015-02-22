@@ -440,6 +440,11 @@ __docker_subcommand () {
         (push)
             _arguments ':images:__docker_images'
             ;;
+        (rename)
+            _arguments \
+                ':old name:__docker_containers' \
+                ':new name: '
+            ;;
         (save)
             _arguments \
                 {-o,--output=-}'[Write to file]:file:_files' \
