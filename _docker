@@ -462,7 +462,7 @@ __docker_subcommand () {
                 ':term: '
             ;;
         (wait)
-            _arguments ':containers:__docker_runningcontainers'
+            _arguments '*:containers:__docker_runningcontainers'
             ;;
         (help)
             _arguments ':subcommand:__docker_commands'
