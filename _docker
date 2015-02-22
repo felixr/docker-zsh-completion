@@ -268,8 +268,6 @@ __docker_subcommand () {
                 '*'{-f,--filter=-}'[Filter values]:filter: ' \
                 '--no-trunc[Do not truncate output]' \
                 {-q,--quiet}'[Only show numeric IDs]' \
-                '--tree[Output graph in tree format]' \
-                '--viz[Output graph in graphviz format]' \
                 ':repository:__docker_repositories'
             ;;
         (inspect)
