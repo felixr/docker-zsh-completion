@@ -451,7 +451,11 @@ __docker_subcommand () {
                 '*:images:__docker_images'
             ;;
         (search)
-            _arguments ':name:__docker_search'
+            _arguments \
+                '--automated[Only show automated builds]' \
+                '--no-trunc[Do not truncate output]' \
+                {-s,--stars=-}'[Only display with at least X stars]:stars:(0 10 100 1000)' \
+                ':term: '
             ;;
         (wait)
             _arguments ':containers:__docker_runningcontainers'
