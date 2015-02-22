@@ -197,8 +197,10 @@ __docker_subcommand () {
             ;;
         (build)
             _arguments \
+                {-f,--file=-}'[Dockerfile to use]:Dockerfile:_files' \
                 '--force-rm[Always remove intermediate containers]' \
                 '--no-cache[Do not use cache when building the image]' \
+                '--pull[Attempt to pull a newer version of the image]' \
                 {-q,--quiet}'[Suppress verbose build output]' \
                 '--rm[Remove intermediate containers after a successful build]' \
                 {-t,--tag=-}'[Repository, name and tag to be applied]:repository:__docker_repositories_with_tags' \
