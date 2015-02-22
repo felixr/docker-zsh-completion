@@ -334,6 +334,10 @@ __docker_subcommand () {
                 {-i,--interactive}'[Attach container'"'"'s stding]' \
                 '*:containers:__docker_stoppedcontainers'
             ;;
+        (stats)
+            _arguments \
+                '*:containers:__docker_runningcontainers'
+            ;;
         (rm)
             _arguments \
                 {-f,--force}'[Force removal]' \
