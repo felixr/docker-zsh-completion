@@ -448,7 +448,7 @@ __docker_subcommand () {
         (save)
             _arguments \
                 {-o,--output=-}'[Write to file]:file:_files' \
-                ':images:__docker_images'
+                '*:images:__docker_images'
             ;;
         (search)
             _arguments ':name:__docker_search'
