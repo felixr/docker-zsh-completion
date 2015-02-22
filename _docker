@@ -432,8 +432,10 @@ __docker_subcommand () {
             esac
 
             ;;
-        (pull|search)
-            _arguments ':name:__docker_search'
+        (pull)
+            _arguments \
+                {-a,--all-tags}'[Download all tagged images]' \
+                ':name:__docker_search'
             ;;
         (push)
             _arguments ':images:__docker_images'
@@ -442,6 +444,9 @@ __docker_subcommand () {
             _arguments \
                 {-o,--output=-}'[Write to file]:file:_files' \
                 ':images:__docker_images'
+            ;;
+        (search)
+            _arguments ':name:__docker_search'
             ;;
         (wait)
             _arguments ':containers:__docker_runningcontainers'
