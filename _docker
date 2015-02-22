@@ -238,11 +238,23 @@ __docker_subcommand () {
                 '--until=-[Events created until this timestamp]:timestamp: '
             ;;
         (exec)
+            local state ret
             _arguments \
                 {-d,--detach}'[Detached mode: leave the container running in the background]' \
                 {-i,--interactive}'[Keep stdin open even if not attached]' \
                 {-t,--tty}'[Allocate a pseudo-tty]' \
-                ':containers:__docker_runningcontainers'
+                ':containers:__docker_runningcontainers' \
+                '*::command:->anycommand' && ret=0
+
+            case $state in
+                (anycommand)
+                    shift 1 words
+                    (( CURRENT-- ))
+                    _normal
+                    ;;
+            esac
+
+            return ret
             ;;
         (history)
             _arguments \
