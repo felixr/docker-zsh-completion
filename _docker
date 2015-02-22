@@ -211,7 +211,6 @@ __docker_subcommand () {
                 {-a,--author=-}'[Author]:author: ' \
                 {-m,--message=-}'[Commit message]:message: ' \
                 {-p,--pause}'[Pause container during commit]' \
-                '--run=-[Configuration automatically applied when the image is run]:configuration: ' \
                 ':container:__docker_containers' \
                 ':repository:__docker_repositories_with_tags'
             ;;
