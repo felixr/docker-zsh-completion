@@ -326,7 +326,7 @@ __docker_subcommand () {
             ;;
         (pause|unpause)
             _arguments \
-                '1:containers:__docker_runningcontainers'
+                '*:containers:__docker_runningcontainers'
             ;;
         (start)
             _arguments \
