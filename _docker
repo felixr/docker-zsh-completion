@@ -82,9 +82,9 @@ __docker_get_containers() {
             s="${name}:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
             s="$s, ${${${line[$begin[IMAGE],$end[IMAGE]]}/:/\\:}%% ##}"
             if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
-                stopped=($stopped $s)
+                stopped=($stopped ${s#*/})
             else
-                running=($running $s)
+                running=($running ${s#*/})
             fi
         done
     done
