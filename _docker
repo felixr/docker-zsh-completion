@@ -39,7 +39,8 @@
 #
 
 __docker_get_containers() {
-    local kind expl
+    integer ret=1
+    local kind
     declare -a running stopped lines args
 
     kind=$1
@@ -90,8 +91,9 @@ __docker_get_containers() {
         done
     done
 
-    [[ $kind = (running|all) ]] && _describe -t containers-running "running containers" running
-    [[ $kind = (stopped|all) ]] && _describe -t containers-stopped "stopped containers" stopped
+    [[ $kind = (running|all) ]] && _describe -t containers-running "running containers" running "$@" && ret=0
+    [[ $kind = (stopped|all) ]] && _describe -t containers-stopped "stopped containers" stopped "$@" && ret=0
+    return ret
 }
 
 __docker_stoppedcontainers() {
@@ -107,11 +109,12 @@ __docker_containers () {
 }
 
 __docker_images () {
-    local expl
+    integer ret=1
     declare -a images
     images=(${${${(f)"$(_call_program commands docker images)"}[2,-1]}/(#b)([^ ]##) ##([^ ]##) ##([^ ]##)*/${match[3]}:${(r:15:: :::)match[2]} in ${match[1]}})
-    _describe -t docker-images "images" images
-    __docker_repositories_with_tags
+    _describe -t docker-images "images" images && ret=0
+    __docker_repositories_with_tags && ret=0
+    return ret
 }
 
 __docker_repositories () {
@@ -122,6 +125,7 @@ __docker_repositories () {
 }
 
 __docker_repositories_with_tags() {
+    integer ret=1
     declare -a repos onlyrepos matched
     declare m
     repos=(${${${${(f)"$(_call_program commands docker images)"}[2,-1]}/ ##/:::}%% *})
@@ -132,17 +136,18 @@ __docker_repositories_with_tags() {
         [[ ${PREFIX%%${~~m}} != ${PREFIX} ]] && {
             # Yes, complete with tags
             repos=(${${repos/:::/:}/:/\\:})
-            _describe -t docker-repos-with-tags "repositories with tags" repos
-            return
+            _describe -t docker-repos-with-tags "repositories with tags" repos && ret=0
+            return ret
         }
     done
     # No, only complete repositories
     onlyrepos=(${${repos%:::*}/:/\\:})
-    _describe -t docker-repos "repositories" onlyrepos -qS :
+    _describe -t docker-repos "repositories" onlyrepos -qS : && ret=0
+
+    return ret
 }
 
 __docker_search() {
-    # declare -a dockersearch
     local cache_policy
     zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
     if [[ -z "$cache_policy" ]]; then
@@ -193,12 +198,14 @@ __docker_commands () {
 
 __docker_subcommand () {
     local -a _command_args
+    local expl
+    integer ret=1
     case "$words[1]" in
         (attach)
             _arguments \
                 '--no-stdin[Do not attach stdin]' \
                 '--sig-proxy[Proxy all received signals to the process (non-TTY mode only)]' \
-                ':containers:__docker_runningcontainers'
+                ':containers:__docker_runningcontainers' && ret=0
             ;;
         (build)
             _arguments \
@@ -209,7 +216,7 @@ __docker_subcommand () {
                 '(-q --quiet)'{-q,--quiet}'[Suppress verbose build output]' \
                 '--rm[Remove intermediate containers after a successful build]' \
                 '(-t --tag)'{-t,--tag=-}'[Repository, name and tag to be applied]: :__docker_repositories_with_tags' \
-                ':path or URL:_directories'
+                ':path or URL:_directories' && ret=0
             ;;
         (commit)
             _arguments \
@@ -217,30 +224,30 @@ __docker_subcommand () {
                 '(-m --message)'{-m,--message=-}'[Commit message]:message: ' \
                 '(-p --pause)'{-p,--pause}'[Pause container during commit]' \
                 ':container:__docker_containers' \
-                ': :__docker_repositories_with_tags'
+                ': :__docker_repositories_with_tags' && ret=0
             ;;
         (cp)
             _arguments \
                 ':container:->container' \
-                ':hostpath:_files'
+                ':hostpath:_files' && ret=0
             case $state in
                 (container)
                     if compset -P '*:'; then
-                        _files
+                        _files && ret=0
                     else
-                        __docker_containers -qS ":"
+                        __docker_containers -qS ":" && ret=0
                     fi
                     ;;
             esac
             ;;
         (diff|export)
-            _arguments '*:containers:__docker_containers'
+            _arguments '*:containers:__docker_containers' && ret=0
             ;;
         (events)
             _arguments \
                 '*'{-f,--filter=-}'[Filter values]:filter: ' \
                 '--since=-[Events created since this timestamp]:timestamp: ' \
-                '--until=-[Events created until this timestamp]:timestamp: '
+                '--until=-[Events created until this timestamp]:timestamp: ' && ret=0
             ;;
         (exec)
             local state ret
@@ -255,7 +262,7 @@ __docker_subcommand () {
                 (anycommand)
                     shift 1 words
                     (( CURRENT-- ))
-                    _normal
+                    _normal && ret=0
                     ;;
             esac
 
@@ -265,7 +272,7 @@ __docker_subcommand () {
             _arguments \
                 '--no-trunc[Do not truncate output]' \
                 '(-q --quiet)'{-q,--quiet}'[Only show numeric IDs]' \
-                '*: :__docker_images'
+                '*: :__docker_images' && ret=0
             ;;
         (images)
             _arguments \
@@ -273,101 +280,101 @@ __docker_subcommand () {
                 '*'{-f,--filter=-}'[Filter values]:filter: ' \
                 '--no-trunc[Do not truncate output]' \
                 '(-q --quiet)'{-q,--quiet}'[Only show numeric IDs]' \
-                ': :__docker_repositories'
+                ': :__docker_repositories' && ret=0
             ;;
         (inspect)
             _arguments \
                 '(-f --format=-)'{-f,--format=-}'[Format the output using the given go template]:template: ' \
-                '*:containers:__docker_containers'
+                '*:containers:__docker_containers' && ret=0
             ;;
         (import)
             _arguments \
                 ':URL:(- http:// file://)' \
-                ': :__docker_repositories_with_tags'
+                ': :__docker_repositories_with_tags' && ret=0
             ;;
         (info)
             ;;
         (import)
             _arguments \
                 ':URL:(- http:// file://)' \
-                ': :__docker_repositories_with_tags'
+                ': :__docker_repositories_with_tags' && ret=0
             ;;
         (insert)
             _arguments '1:containers:__docker_containers' \
                        '2:URL:(http:// file://)' \
-                       '3:file:_files'
+                       '3:file:_files' && ret=0
             ;;
         (kill)
             _arguments \
                 '(-s --signal)'{-s,--signal=-}'[Signal to send]:signal:_signals' \
-                '*:containers:__docker_runningcontainers'
+                '*:containers:__docker_runningcontainers' && ret=0
             ;;
         (load)
             _arguments \
-                '(-i --input)'{-i,--input=-}'[Read from tar archive file]:archive file:_files -g "*.((tar|TAR)(.gz|.GZ|.Z|.bz2|.lzma|.xz|)|(tbz|tgz|txz))(-.)"'
+                '(-i --input)'{-i,--input=-}'[Read from tar archive file]:archive file:_files -g "*.((tar|TAR)(.gz|.GZ|.Z|.bz2|.lzma|.xz|)|(tbz|tgz|txz))(-.)"' && ret=0
             ;;
         (login)
             _arguments \
                 '(-e --email)'{-e,--email=-}'[Email]:email: ' \
                 '(-p --password)'{-p,--password=-}'[Password]:password: ' \
                 '(-u --user)'{-u,--user=-}'[Username]:username: ' \
-                ':server: '
+                ':server: ' && ret=0
             ;;
         (logout)
             _arguments \
-                ':server: '
+                ':server: ' && ret=0
             ;;
         (logs)
             _arguments \
                 '(-f --follow)'{-f,--follow}'[Follow log output]' \
                 '(-t --timestamps)'{-t,--timestamps}'[Show timestamps]' \
                 '--tail=-[Output the last K lines]:lines:(1 10 20 50 all)' \
-                '*:containers:__docker_containers'
+                '*:containers:__docker_containers' && ret=0
             ;;
         (port)
             _arguments \
                 '1:containers:__docker_runningcontainers' \
-                '2:port:_ports'
+                '2:port:_ports' && ret=0
             ;;
         (pause|unpause)
             _arguments \
-                '*:containers:__docker_runningcontainers'
+                '*:containers:__docker_runningcontainers' && ret=0
             ;;
         (start)
             _arguments \
                 '(-a --attach)'{-a,--attach}'[Attach container'"'"'s stdout/stderr and forward all signals]' \
                 '(-i --interactive)'{-i,--interactive}'[Attach container'"'"'s stding]' \
-                '*:containers:__docker_stoppedcontainers'
+                '*:containers:__docker_stoppedcontainers' && ret=0
             ;;
         (stats)
             _arguments \
-                '*:containers:__docker_runningcontainers'
+                '*:containers:__docker_runningcontainers' && ret=0
             ;;
         (rm)
             _arguments \
                 '(-f --force)'{-f,--force}'[Force removal]' \
                 '(-l --link)'{-l,--link}'[Remove the specified link and not the underlying container]' \
                 '(-v --volumes)'{-v,--volumes}'[Remove the volumes associated to the container]' \
-                '*:containers:__docker_stoppedcontainers'
+                '*:containers:__docker_stoppedcontainers' && ret=0
             ;;
         (rmi)
             _arguments \
                 '(-f --force)'{-f,--force}'[Force removal]' \
                 '--no-prune[Do not delete untagged parents]' \
-                '*: :__docker_images'
+                '*: :__docker_images' && ret=0
             ;;
         (restart|stop)
             _arguments \
                 '(-t --time=-)'{-t,--time=-}'[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)' \
-                '*:containers:__docker_runningcontainers'
+                '*:containers:__docker_runningcontainers' && ret=0
             ;;
         (top)
             _arguments \
                 '1:containers:__docker_runningcontainers' \
-                '(-)*:: :->ps-arguments'
+                '(-)*:: :->ps-arguments' && ret=0
             case $state in
                 (ps-arguments)
-                    _ps
+                    _ps && ret=0
                     ;;
             esac
 
@@ -382,13 +389,13 @@ __docker_subcommand () {
                 '--no-trunc[Do not truncate output]' \
                 '(-q --quiet)'{-q,--quiet}'[Only show numeric IDs]' \
                 '(-s --size)'{-s,--size}'[Display total file sizes]' \
-                '--since=-[Show only containers created since...]:containers:__docker_containers'
+                '--since=-[Show only containers created since...]:containers:__docker_containers' && ret=0
             ;;
         (tag)
             _arguments \
                 '(-f --force)'{-f,--force}'[force]'\
                 ':source:__docker_images'\
-                ':destination:__docker_repositories_with_tags'
+                ':destination:__docker_repositories_with_tags' && ret=0
             ;;
         (create|run)
             _arguments \
@@ -428,14 +435,14 @@ __docker_subcommand () {
                 '(-w --workdir)'{-w,--workdir=-}'[Working directory inside the container]:directory:_directories' \
                 '(-): :__docker_images' \
                 '(-):command: _command_names -e' \
-                '*::arguments: _normal'
+                '*::arguments: _normal' && ret=0
 
             case $state in
                 (link)
                     if compset -P '*:'; then
-                        _wanted alias expl 'Alias' compadd -E ""
+                        _wanted alias expl 'Alias' compadd -E "" && ret=0
                     else
-                        __docker_runningcontainers -qS ":"
+                        __docker_runningcontainers -qS ":" && ret=0
                     fi
                     ;;
             esac
@@ -444,38 +451,39 @@ __docker_subcommand () {
         (pull)
             _arguments \
                 '(-a --all-tags)'{-a,--all-tags}'[Download all tagged images]' \
-                ':name:__docker_search'
+                ':name:__docker_search' && ret=0
             ;;
         (push)
-            _arguments ': :__docker_images'
+            _arguments ': :__docker_images' && ret=0
             ;;
         (rename)
             _arguments \
                 ':old name:__docker_containers' \
-                ':new name: '
+                ':new name: ' && ret=0
             ;;
         (save)
             _arguments \
                 '(-o --output)'{-o,--output=-}'[Write to file]:file:_files' \
-                '*: :__docker_images'
+                '*: :__docker_images' && ret=0
             ;;
         (search)
             _arguments \
                 '--automated[Only show automated builds]' \
                 '--no-trunc[Do not truncate output]' \
                 '(-s --stars)'{-s,--stars=-}'[Only display with at least X stars]:stars:(0 10 100 1000)' \
-                ':term: '
+                ':term: ' && ret=0
             ;;
         (wait)
-            _arguments '*:containers:__docker_runningcontainers'
+            _arguments '*:containers:__docker_runningcontainers' && ret=0
             ;;
         (help)
-            _arguments ':subcommand:__docker_commands'
+            _arguments ':subcommand:__docker_commands' && ret=0
             ;;
         (*)
             _message 'Unknown sub command'
     esac
 
+    return ret
 }
 
 _docker () {
@@ -487,6 +495,7 @@ _docker () {
     fi
 
     local curcontext="$curcontext" state line
+    integer ret=1
     typeset -A opt_args
 
     _arguments -C \
@@ -533,17 +542,19 @@ _docker () {
         '--userland-proxy[Use userland proxy for loopback traffic]' \
         '(-v --version)'{-v,--version}'[Print version information and quit]' \
         '(-): :->command' \
-        '(-)*:: :->option-or-argument'
+        '(-)*:: :->option-or-argument' && ret=0
 
     case $state in
         (command)
-            __docker_commands
+            __docker_commands && ret=0
             ;;
         (option-or-argument)
             curcontext=${curcontext%:*:*}:docker-$words[1]:
-            __docker_subcommand
+            __docker_subcommand && ret=0
             ;;
     esac
+
+    return ret
 }
 
 _docker "$@"
