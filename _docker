@@ -489,13 +489,51 @@ _docker () {
     typeset -A opt_args
 
     _arguments -C \
-      '-H[tcp://host:port to bind/connect to]:socket: ' \
-         '(-): :->command' \
-         '(-)*:: :->option-or-argument'
+        '--api-cors-header=-[Set CORS headers in the remote API]:CORS headers: ' \
+        '(-b --bridge)'{-b,--bridge=-}'[Attach containers to a network bridge]:bridge:_net_interfaces' \
+        '--bip=-[Specify network bridge IP]' \
+        '(-D --debug)'{-D,--debug}'[Enable debug mode]' \
+        '(-d --daeamon)'{-d,--daemon}'[Enable daemon mode]' \
+        '--default-gateway[Container default gateway IPv4 address]:IPv4 address: ' \
+        '--default-gateway-v6[Container default gateway IPv6 address]:IPv6 address: ' \
+        '*--dns=-[DNS server to use]:DNS: ' \
+        '*--dns-search=-[DNS search domains to use]' \
+        '*--default-ulimit=-[Set default ulimit settings for containers]:ulimit: ' \
+        '(-e --exec-driver)'{-e,--exec-driver=-}'[Exec driver to use]:driver:(native lxc windows)' \
+        '*--exec-opt=-[Set exec driver options]:exec driver options: ' \
+        '--exec-root=-[Root of the Docker execdriver (default: /var/run/docker)]:path:_directories' \
+        '--fixed-cidr=-[IPv4 subnet for fixed IPs]:IPv4 subnet: ' \
+        '--fixed-cidr-v6=-[IPv6 subnet for fixed IPs]:IPv6 subnet: ' \
+        '(-G --group)'{-G,--group=-}'[Group for the unix socket (default: docker)]:group:_groups' \
+        '(-g --graph)'{-g,--graph=-}'[Root of the Docker runtime (default: /var/lib/docker)]:path:_directories' \
+        '(-H --host)'{-H,--host=-}'[tcp://host:port to bind/connect to]:host: ' \
+        '--icc[Enable inter-container communication]' \
+        '*--insecure-registry=-[Enable insecure registry communication]:registry: ' \
+        '--ip=-[Default IP when binding container ports]' \
+        '--ip-forward[Enable net.ipv4.ip_forward]' \
+        '--ip-masq[Enable IP masquerading]' \
+        '--iptables[Enable addition of iptables rules]' \
+        '--ipv6[Enable IPv6 networking]' \
+        '(-l --log-level)'{-l,--log-level=-}'[Set the logging level]:level:(debug info warn error fatal)' \
+        '*--label=-[Set key=value labels to the daemon]:label: ' \
+        '--log-driver=-[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd none)' \
+        '*--log-opt=-[Log driver specific options]:log driver options: ' \
+        '--mtu=-[Set the containers network MTU]:mtu:(0 576 1420 1500 9000)' \
+        '(-p --pidfile)'{-p,--pidfile=-}'[Path to use for daemon PID file (default: /var/run/docker.pid)]:PID file:_files' \
+        '*--registry-mirror=-[Preferred Docker registry mirror]:registry mirror: ' \
+        '(-s --storage-driver)'{-s,--storage-driver=-}'[Storage driver to use]:driver:(aufs devicemapper btrfs zfs overlay)' \
+        '--selinux-enabled[Enable selinux support]' \
+        '*--storage-opt=-[Set storage driver options]:storage driver options: ' \
+        '--tls[Use TLS]' \
+        '--tlscacert=-[Trust certs signed only by this CA]:PEM file:_files -g "*.(pem|crt)"' \
+        '--tlscert=-[Path to TLS certificate file]:PEM file:_files -g "*.(pem|crt)"' \
+        '--tlskey=-[Path to TLS key file]:Key file:_files -g "*.(pem|key)"' \
+        '--tlsverify[Use TLS and verify the remote]' \
+        '--userland-proxy[Use userland proxy for loopback traffic]' \
+        '(-v --version)'{-v,--version}'[Print version information and quit]' \
+        '(-): :->command' \
+        '(-)*:: :->option-or-argument'
 
-    if (( CURRENT == 1 )); then
-
-    fi
     case $state in
         (command)
             __docker_commands
