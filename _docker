@@ -48,18 +48,18 @@ __docker_get_containers() {
     shift
     [[ $kind = (stopped|all) ]] && args=($args -a)
 
-    lines=(${(f)"$(_call_program commands docker ps ${args})"})
+    lines=(${(f)"$(_call_program commands docker ps $args)"})
 
     # Parse header line to find columns
     local i=1 j=1 k header=${lines[1]}
     declare -A begin end
-    while (( $j < ${#header} - 1 )) {
-        i=$(( $j + ${${header[$j,-1]}[(i)[^ ]]} - 1))
-        j=$(( $i + ${${header[$i,-1]}[(i)  ]} - 1))
-        k=$(( $j + ${${header[$j,-1]}[(i)[^ ]]} - 2))
-        begin[${header[$i,$(($j-1))]}]=$i
-        end[${header[$i,$(($j-1))]}]=$k
-    }
+    while (( j < ${#header} - 1 )); do
+        i=$(( j + ${${header[$j,-1]}[(i)[^ ]]} - 1 ))
+        j=$(( i + ${${header[$i,-1]}[(i)  ]} - 1 ))
+        k=$(( j + ${${header[$j,-1]}[(i)[^ ]]} - 2 ))
+        begin[${header[$i,$((j-1))]}]=$i
+        end[${header[$i,$((j-1))]}]=$k
+    done
     lines=(${lines[2,-1]})
 
     # Container ID
@@ -68,7 +68,7 @@ __docker_get_containers() {
     for line in $lines; do
         s="${line[${begin[CONTAINER ID]},${end[CONTAINER ID]}]%% ##}"
         s="$s:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
-        s="$s, ${${${line[$begin[IMAGE],$end[IMAGE]]}/:/\\:}%% ##}"
+        s="$s, ${${${line[${begin[IMAGE]},${end[IMAGE]}]}/:/\\:}%% ##}"
         if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
             stopped=($stopped $s)
         else
@@ -83,7 +83,7 @@ __docker_get_containers() {
         names=(${(ps:,:)${${line[${begin[NAMES]},-1]}%% *}})
         for name in $names; do
             s="${name}:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
-            s="$s, ${${${line[$begin[IMAGE],$end[IMAGE]]}/:/\\:}%% ##}"
+            s="$s, ${${${line[${begin[IMAGE]},${end[IMAGE]}]}/:/\\:}%% ##}"
             if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
                 stopped=($stopped ${s#*/})
             else
@@ -107,12 +107,12 @@ __docker_runningcontainers() {
     __docker_get_containers running "$@"
 }
 
-__docker_containers () {
+__docker_containers() {
     [[ $PREFIX = -* ]] && return 1
     __docker_get_containers all "$@"
 }
 
-__docker_images () {
+__docker_images() {
     [[ $PREFIX = -* ]] && return 1
     integer ret=1
     declare -a images
@@ -122,7 +122,7 @@ __docker_images () {
     return ret
 }
 
-__docker_repositories () {
+__docker_repositories() {
     [[ $PREFIX = -* ]] && return 1
     declare -a repos
     repos=(${${${(f)"$(_call_program commands docker images)"}%% *}[2,-1]})
@@ -171,19 +171,18 @@ __docker_search() {
     if ( [[ ${(P)+cachename} -eq 0 ]] || _cache_invalid ${cachename#_} ) \
         && ! _retrieve_cache ${cachename#_}; then
         _message "Searching for ${searchterm}..."
-        result=(${${${(f)"$(_call_program commands docker search ${searchterm})"}%% *}[2,-1]})
+        result=(${${${(f)"$(_call_program commands docker search searchterm)"}%% *}[2,-1]})
         _store_cache ${cachename#_} result
     fi
     _wanted dockersearch expl 'available images' compadd -a result
 }
 
-__docker_caching_policy()
-{
+__docker_caching_policy() {
   oldp=( "$1"(Nmh+1) )     # 1 hour
   (( $#oldp ))
 }
 
-__docker_commands () {
+__docker_commands() {
     local cache_policy
 
     zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
@@ -203,7 +202,7 @@ __docker_commands () {
     _describe -t docker-commands "docker command" _docker_subcommands
 }
 
-__docker_subcommand () {
+__docker_subcommand() {
     local -a _command_args opts_help opts_cpumem opts_create
     local expl help="-h --help"
     integer ret=1
@@ -578,7 +577,7 @@ __docker_subcommand () {
     return ret
 }
 
-_docker () {
+_docker() {
     # Support for subservices, which allows for `compdef _docker docker-shell=_docker_containers`.
     # Based on /usr/share/zsh/functions/Completion/Unix/_git without support for `ret`.
     if [[ $service != docker ]]; then
