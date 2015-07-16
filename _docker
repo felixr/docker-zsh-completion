@@ -140,7 +140,7 @@ __docker_repositories_with_tags() {
     # Check if we have a prefix-match for the current prefix.
     onlyrepos=(${repos%::*})
     for m in $onlyrepos; do
-        [[ ${PREFIX%%${~~m}} != ${PREFIX} ]] && {
+        [[ ${PREFIX##${~~m}} != ${PREFIX} ]] && {
             # Yes, complete with tags
             repos=(${${repos/:::/:}/:/\\:})
             _describe -t docker-repos-with-tags "repositories with tags" repos && ret=0
