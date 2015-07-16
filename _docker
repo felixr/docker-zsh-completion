@@ -121,11 +121,23 @@ __docker_repositories () {
 }
 
 __docker_repositories_with_tags() {
-    declare -a repos
-    repos=(${${${${${(f)"$(_call_program commands docker images)"}[2,-1]}/ ##/:}%% *}/:/\\:})
-    repos=(${${repos%\\:<none>}#<none>})
-    _describe -t docker-repos-with-tags "repositories with tags" repos
-    __docker_repositories -qS ":"
+    declare -a repos onlyrepos matched
+    declare m
+    repos=(${${${${(f)"$(_call_program commands docker images)"}[2,-1]}/ ##/:::}%% *})
+    repos=(${${repos%:::<none>}#<none>})
+    # Check if we have a prefix-match for the current prefix.
+    onlyrepos=(${repos%::*})
+    for m in $onlyrepos; do
+        [[ ${PREFIX%%${~~m}} != ${PREFIX} ]] && {
+            # Yes, complete with tags
+            repos=(${${repos/:::/:}/:/\\:})
+            _describe -t docker-repos-with-tags "repositories with tags" repos
+            return
+        }
+    done
+    # No, only complete repositories
+    onlyrepos=(${${repos%:::*}/:/\\:})
+    _describe -t docker-repos "repositories" onlyrepos -qS :
 }
 
 __docker_search() {
