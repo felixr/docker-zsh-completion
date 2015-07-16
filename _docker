@@ -399,6 +399,7 @@ __docker_subcommand () {
             _arguments \
                 $opts_help \
                 "($help -f --format=-)"{-f,--format=-}"[Format the output using the given go template]:template: " \
+                "($help)--type=-[Return JSON for specified type]:type:(image container)" \
                 "($help -)*:containers:__docker_containers" && ret=0
             ;;
         (kill)
