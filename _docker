@@ -309,6 +309,26 @@ __docker_subcommand () {
                     ;;
             esac
             ;;
+        (create)
+            _arguments \
+                $opts_help \
+                $opts_cpumem \
+                $opts_create \
+                "($help -): :__docker_images" \
+                "($help -):command: _command_names -e" \
+                "($help -)*::arguments: _normal" && ret=0
+
+            case $state in
+                (link)
+                    if compset -P "*:"; then
+                        _wanted alias expl "Alias" compadd -E "" && ret=0
+                    else
+                        __docker_runningcontainers -qS ":" && ret=0
+                    fi
+                    ;;
+            esac
+
+            ;;
         (diff)
             _arguments \
                 $opts_help \
@@ -414,29 +434,52 @@ __docker_subcommand () {
                 "($help)--tail=-[Output the last K lines]:lines:(1 10 20 50 all)" \
                 "($help -)*:containers:__docker_containers" && ret=0
             ;;
+        (pause|unpause)
+            _arguments \
+                $opts_help \
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
+            ;;
         (port)
             _arguments \
                 $opts_help \
                 "($help -)1:containers:__docker_runningcontainers" \
                 "($help -)2:port:_ports" && ret=0
             ;;
-        (pause|unpause)
+        (ps)
             _arguments \
                 $opts_help \
+                "($help -a --all)"{-a,--all}"[Show all containers]" \
+                "($help)--before=-[Show only container created before...]:containers:__docker_containers" \
+                "($help)*"{-f,--filter=-}"[Filter values]:filter: " \
+                "($help -l --latest)"{-l,--latest}"[Show only the latest created container]" \
+                "($help)-n[Show n last created containers, include non-running one]:n:(1 5 10 25 50)" \
+                "($help)--no-trunc[Do not truncate output]" \
+                "($help -q --quiet)"{-q,--quiet}"[Only show numeric IDs]" \
+                "($help -s --size)"{-s,--size}"[Display total file sizes]" \
+                "($help)--since=-[Show only containers created since...]:containers:__docker_containers" && ret=0
+            ;;
+        (pull)
+            _arguments \
+                $opts_help \
+                "($help -a --all-tags)"{-a,--all-tags}"[Download all tagged images]" \
+                "($help -):name:__docker_search" && ret=0
+            ;;
+        (push)
+            _arguments \
+                $opts_help \
+                "($help -): :__docker_images" && ret=0
+            ;;
+        (restart|stop)
+            _arguments \
+                $opts_help \
+                "($help -t --time=-)"{-t,--time=-}"[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)" \
                 "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
-        (start)
+        (rename)
             _arguments \
                 $opts_help \
-                "($help -a --attach)"{-a,--attach}"[Attach container's stdout/stderr and forward all signals]" \
-                "($help -i --interactive)"{-i,--interactive}"[Attach container's stding]" \
-                "($help -)*:containers:__docker_stoppedcontainers" && ret=0
-            ;;
-        (stats)
-            _arguments \
-                $opts_help \
-                "($help)--no-stream[Disable streaming stats and only pull the first result]" \
-                "($help -)*:containers:__docker_runningcontainers" && ret=0
+                "($help -):old name:__docker_containers" \
+                "($help -):new name: " && ret=0
             ;;
         (rm)
             _arguments \
@@ -452,81 +495,6 @@ __docker_subcommand () {
                 "($help -f --force)"{-f,--force}"[Force removal]" \
                 "($help)--no-prune[Do not delete untagged parents]" \
                 "($help -)*: :__docker_images" && ret=0
-            ;;
-        (restart|stop)
-            _arguments \
-                $opts_help \
-                "($help -t --time=-)"{-t,--time=-}"[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)" \
-                "($help -)*:containers:__docker_runningcontainers" && ret=0
-            ;;
-        (top)
-            _arguments \
-                $opts_help \
-                "($help -)1:containers:__docker_runningcontainers" \
-                "($help -)*:: :->ps-arguments" && ret=0
-            case $state in
-                (ps-arguments)
-                    _ps && ret=0
-                    ;;
-            esac
-
-            ;;
-        (ps)
-            _arguments \
-                $opts_help \
-                "($help -a --all)"{-a,--all}"[Show all containers]" \
-                "($help)--before=-[Show only container created before...]:containers:__docker_containers" \
-                "($help)*"{-f,--filter=-}"[Filter values]:filter: " \
-                "($help -l --latest)"{-l,--latest}"[Show only the latest created container]" \
-                "($help)-n[Show n last created containers, include non-running one]:n:(1 5 10 25 50)" \
-                "($help)--no-trunc[Do not truncate output]" \
-                "($help -q --quiet)"{-q,--quiet}"[Only show numeric IDs]" \
-                "($help -s --size)"{-s,--size}"[Display total file sizes]" \
-                "($help)--since=-[Show only containers created since...]:containers:__docker_containers" && ret=0
-            ;;
-        (tag)
-            _arguments \
-                $opts_help \
-                "($help -f --force)"{-f,--force}"[force]"\
-                "($help -):source:__docker_images"\
-                "($help -):destination:__docker_repositories_with_tags" && ret=0
-            ;;
-        (create)
-            _arguments \
-                $opts_help \
-                $opts_cpumem \
-                $opts_create \
-                "($help -): :__docker_images" \
-                "($help -):command: _command_names -e" \
-                "($help -)*::arguments: _normal" && ret=0
-
-            case $state in
-                (link)
-                    if compset -P "*:"; then
-                        _wanted alias expl "Alias" compadd -E "" && ret=0
-                    else
-                        __docker_runningcontainers -qS ":" && ret=0
-                    fi
-                    ;;
-            esac
-
-            ;;
-        (pull)
-            _arguments \
-                $opts_help \
-                "($help -a --all-tags)"{-a,--all-tags}"[Download all tagged images]" \
-                "($help -):name:__docker_search" && ret=0
-            ;;
-        (push)
-            _arguments \
-                $opts_help \
-                "($help -): :__docker_images" && ret=0
-            ;;
-        (rename)
-            _arguments \
-                $opts_help \
-                "($help -):old name:__docker_containers" \
-                "($help -):new name: " && ret=0
             ;;
         (run)
             _arguments \
@@ -563,6 +531,38 @@ __docker_subcommand () {
                 "($help)--no-trunc[Do not truncate output]" \
                 "($help -s --stars)"{-s,--stars=-}"[Only display with at least X stars]:stars:(0 10 100 1000)" \
                 "($help -):term: " && ret=0
+            ;;
+        (start)
+            _arguments \
+                $opts_help \
+                "($help -a --attach)"{-a,--attach}"[Attach container's stdout/stderr and forward all signals]" \
+                "($help -i --interactive)"{-i,--interactive}"[Attach container's stding]" \
+                "($help -)*:containers:__docker_stoppedcontainers" && ret=0
+            ;;
+        (stats)
+            _arguments \
+                $opts_help \
+                "($help)--no-stream[Disable streaming stats and only pull the first result]" \
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
+            ;;
+        (tag)
+            _arguments \
+                $opts_help \
+                "($help -f --force)"{-f,--force}"[force]"\
+                "($help -):source:__docker_images"\
+                "($help -):destination:__docker_repositories_with_tags" && ret=0
+            ;;
+        (top)
+            _arguments \
+                $opts_help \
+                "($help -)1:containers:__docker_runningcontainers" \
+                "($help -)*:: :->ps-arguments" && ret=0
+            case $state in
+                (ps-arguments)
+                    _ps && ret=0
+                    ;;
+            esac
+
             ;;
         (wait)
             _arguments \
