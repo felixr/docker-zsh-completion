@@ -48,7 +48,7 @@ __docker_get_containers() {
     shift
     [[ $kind = (stopped|all) ]] && args=($args -a)
 
-    lines=(${(f)"$(_call_program commands docker ps $args)"})
+    lines=(${(f)"$(_call_program commands docker $docker_options ps $args)"})
 
     # Parse header line to find columns
     local i=1 j=1 k header=${lines[1]}
@@ -116,7 +116,7 @@ __docker_images() {
     [[ $PREFIX = -* ]] && return 1
     integer ret=1
     declare -a images
-    images=(${${${(f)"$(_call_program commands docker images)"}[2,-1]}/(#b)([^ ]##) ##([^ ]##) ##([^ ]##)*/${match[3]}:${(r:15:: :::)match[2]} in ${match[1]}})
+    images=(${${${(f)"$(_call_program commands docker $docker_options images)"}[2,-1]}/(#b)([^ ]##) ##([^ ]##) ##([^ ]##)*/${match[3]}:${(r:15:: :::)match[2]} in ${match[1]}})
     _describe -t docker-images "images" images && ret=0
     __docker_repositories_with_tags && ret=0
     return ret
@@ -125,7 +125,7 @@ __docker_images() {
 __docker_repositories() {
     [[ $PREFIX = -* ]] && return 1
     declare -a repos
-    repos=(${${${(f)"$(_call_program commands docker images)"}%% *}[2,-1]})
+    repos=(${${${(f)"$(_call_program commands docker $docker_options images)"}%% *}[2,-1]})
     repos=(${repos#<none>})
     _describe -t docker-repos "repositories" repos
 }
@@ -135,7 +135,7 @@ __docker_repositories_with_tags() {
     integer ret=1
     declare -a repos onlyrepos matched
     declare m
-    repos=(${${${${(f)"$(_call_program commands docker images)"}[2,-1]}/ ##/:::}%% *})
+    repos=(${${${${(f)"$(_call_program commands docker $docker_options images)"}[2,-1]}/ ##/:::}%% *})
     repos=(${${repos%:::<none>}#<none>})
     # Check if we have a prefix-match for the current prefix.
     onlyrepos=(${repos%::*})
@@ -171,7 +171,7 @@ __docker_search() {
     if ( [[ ${(P)+cachename} -eq 0 ]] || _cache_invalid ${cachename#_} ) \
         && ! _retrieve_cache ${cachename#_}; then
         _message "Searching for ${searchterm}..."
-        result=(${${${(f)"$(_call_program commands docker search searchterm)"}%% *}[2,-1]})
+        result=(${${${(f)"$(_call_program commands docker $docker_options search $searchterm)"}%% *}[2,-1]})
         _store_cache ${cachename#_} result
     fi
     _wanted dockersearch expl 'available images' compadd -a result
@@ -635,6 +635,9 @@ _docker() {
         "($help -v --version)"{-v,--version}"[Print version information and quit]" \
         "($help -): :->command" \
         "($help -)*:: :->option-or-argument" && ret=0
+
+    local host=${opt_args[-H]}${opt_args[--host]}
+    local docker_options=${host:+--host $host}
 
     case $state in
         (command)
