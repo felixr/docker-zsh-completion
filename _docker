@@ -214,7 +214,7 @@ __docker_subcommand () {
                 $opts_help \
                 "($help)--no-stdin[Do not attach stdin]" \
                 "($help)--sig-proxy[Proxy all received signals to the process (non-TTY mode only)]" \
-                "($help):containers:__docker_runningcontainers" && ret=0
+                "($help -):containers:__docker_runningcontainers" && ret=0
             ;;
         (build)
             _arguments \
@@ -235,7 +235,7 @@ __docker_subcommand () {
                 "($help -q --quiet)"{-q,--quiet}"[Suppress verbose build output]" \
                 "($help)--rm[Remove intermediate containers after a successful build]" \
                 "($help -t --tag)"{-t,--tag=-}"[Repository, name and tag for the image]: :__docker_repositories_with_tags" \
-                "($help):path or URL:_directories" && ret=0
+                "($help -):path or URL:_directories" && ret=0
             ;;
         (commit)
             _arguments \
@@ -244,14 +244,14 @@ __docker_subcommand () {
                 "($help -c --change)*"{-c,--change=-}"[Apply Dockerfile instruction to the created image]:Dockerfile:_files" \
                 "($help -m --message)"{-m,--message=-}"[Commit message]:message: " \
                 "($help -p --pause)"{-p,--pause}"[Pause container during commit]" \
-                "($help):container:__docker_containers" \
-                "($help): :__docker_repositories_with_tags" && ret=0
+                "($help -):container:__docker_containers" \
+                "($help -): :__docker_repositories_with_tags" && ret=0
             ;;
         (cp)
             _arguments \
                 $opts_help \
-                "($help):container:->container" \
-                "($help):hostpath:_files" && ret=0
+                "($help -)1:container:->container" \
+                "($help -)2:hostpath:_files" && ret=0
             case $state in
                 (container)
                     if compset -P "*:"; then
@@ -265,7 +265,7 @@ __docker_subcommand () {
         (diff)
             _arguments \
                 $opts_help \
-                "($help)*:containers:__docker_containers" && ret=0
+                "($help -)*:containers:__docker_containers" && ret=0
             ;;
         (events)
             _arguments \
@@ -282,8 +282,8 @@ __docker_subcommand () {
                 "($help -i --interactive)"{-i,--interactive}"[Keep stdin open even if not attached]" \
                 "($help -t --tty)"{-t,--tty}"[Allocate a pseudo-tty]" \
                 "($help -u --user)"{-u,--user=-}"[Username or UID]:user:_users" \
-                "($help):containers:__docker_runningcontainers" \
-                "($help)*::command:->anycommand" && ret=0
+                "($help -):containers:__docker_runningcontainers" \
+                "($help -)*::command:->anycommand" && ret=0
 
             case $state in
                 (anycommand)
@@ -297,7 +297,7 @@ __docker_subcommand () {
             _arguments \
                 $opts_help \
                 "($help -o --output)"{-o,--output=-}"[Write to a file, instead of stdout]:output file:_files" \
-                "($help)*:containers:__docker_containers" && ret=0
+                "($help -)*:containers:__docker_containers" && ret=0
             ;;
         (history)
             _arguments \
@@ -305,7 +305,7 @@ __docker_subcommand () {
                 "($help -H --human)"{-H,--human}"[Print sizes and dates in human readable format]" \
                 "($help)--no-trunc[Do not truncate output]" \
                 "($help -q --quiet)"{-q,--quiet}"[Only show numeric IDs]" \
-                "($help)*: :__docker_images" && ret=0
+                "($help -)*: :__docker_images" && ret=0
             ;;
         (images)
             _arguments \
@@ -315,14 +315,14 @@ __docker_subcommand () {
                 "($help)*"{-f,--filter=-}"[Filter values]:filter: " \
                 "($help)--no-trunc[Do not truncate output]" \
                 "($help -q --quiet)"{-q,--quiet}"[Only show numeric IDs]" \
-                "($help): :__docker_repositories" && ret=0
+                "($help -): :__docker_repositories" && ret=0
             ;;
         (import)
             _arguments \
                 $opts_help \
                 "($help -c --change)*"{-c,--change=-}"[Apply Dockerfile instruction to the created image]:Dockerfile:_files" \
-                "($help):URL:(- http:// file://)" \
-                "($help): :__docker_repositories_with_tags" && ret=0
+                "($help -):URL:(- http:// file://)" \
+                "($help -): :__docker_repositories_with_tags" && ret=0
             ;;
         (info|version)
             _arguments \
@@ -332,13 +332,13 @@ __docker_subcommand () {
             _arguments \
                 $opts_help \
                 "($help -f --format=-)"{-f,--format=-}"[Format the output using the given go template]:template: " \
-                "($help)*:containers:__docker_containers" && ret=0
+                "($help -)*:containers:__docker_containers" && ret=0
             ;;
         (kill)
             _arguments \
                 $opts_help \
                 "($help -s --signal)"{-s,--signal=-}"[Signal to send]:signal:_signals" \
-                "($help)*:containers:__docker_runningcontainers" && ret=0
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
         (load)
             _arguments \
@@ -351,12 +351,12 @@ __docker_subcommand () {
                 "($help -e --email)"{-e,--email=-}"[Email]:email: " \
                 "($help -p --password)"{-p,--password=-}"[Password]:password: " \
                 "($help -u --user)"{-u,--user=-}"[Username]:username: " \
-                "($help):server: " && ret=0
+                "($help -)1:server: " && ret=0
             ;;
         (logout)
             _arguments \
                 $opts_help \
-                "($help):server: " && ret=0
+                "($help -)1:server: " && ret=0
             ;;
         (logs)
             _arguments \
@@ -365,31 +365,31 @@ __docker_subcommand () {
                 "($help -t --timestamps)"{-t,--timestamps}"[Show timestamps]" \
                 "($help -s --since)"{-s,--since=-}"[Show logs since this timestamp]:timestamp: " \
                 "($help)--tail=-[Output the last K lines]:lines:(1 10 20 50 all)" \
-                "($help)*:containers:__docker_containers" && ret=0
+                "($help -)*:containers:__docker_containers" && ret=0
             ;;
         (port)
             _arguments \
                 $opts_help \
-                "($help)1:containers:__docker_runningcontainers" \
-                "($help)2:port:_ports" && ret=0
+                "($help -)1:containers:__docker_runningcontainers" \
+                "($help -)2:port:_ports" && ret=0
             ;;
         (pause|unpause)
             _arguments \
                 $opts_help \
-                "($help)*:containers:__docker_runningcontainers" && ret=0
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
         (start)
             _arguments \
                 $opts_help \
                 "($help -a --attach)"{-a,--attach}"[Attach container's stdout/stderr and forward all signals]" \
                 "($help -i --interactive)"{-i,--interactive}"[Attach container's stding]" \
-                "($help)*:containers:__docker_stoppedcontainers" && ret=0
+                "($help -)*:containers:__docker_stoppedcontainers" && ret=0
             ;;
         (stats)
             _arguments \
                 $opts_help \
                 "($help)--no-stream[Disable streaming stats and only pull the first result]" \
-                "($help)*:containers:__docker_runningcontainers" && ret=0
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
         (rm)
             _arguments \
@@ -397,25 +397,25 @@ __docker_subcommand () {
                 "($help -f --force)"{-f,--force}"[Force removal]" \
                 "($help -l --link)"{-l,--link}"[Remove the specified link and not the underlying container]" \
                 "($help -v --volumes)"{-v,--volumes}"[Remove the volumes associated to the container]" \
-                "($help)*:containers:__docker_stoppedcontainers" && ret=0
+                "($help -)*:containers:__docker_stoppedcontainers" && ret=0
             ;;
         (rmi)
             _arguments \
                 $opts_help \
                 "($help -f --force)"{-f,--force}"[Force removal]" \
                 "($help)--no-prune[Do not delete untagged parents]" \
-                "($help)*: :__docker_images" && ret=0
+                "($help -)*: :__docker_images" && ret=0
             ;;
         (restart|stop)
             _arguments \
                 $opts_help \
                 "($help -t --time=-)"{-t,--time=-}"[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)" \
-                "($help)*:containers:__docker_runningcontainers" && ret=0
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
         (top)
             _arguments \
                 $opts_help \
-                "($help)1:containers:__docker_runningcontainers" \
+                "($help -)1:containers:__docker_runningcontainers" \
                 "($help -)*:: :->ps-arguments" && ret=0
             case $state in
                 (ps-arguments)
@@ -441,8 +441,8 @@ __docker_subcommand () {
             _arguments \
                 $opts_help \
                 "($help -f --force)"{-f,--force}"[force]"\
-                "($help):source:__docker_images"\
-                "($help):destination:__docker_repositories_with_tags" && ret=0
+                "($help -):source:__docker_images"\
+                "($help -):destination:__docker_repositories_with_tags" && ret=0
             ;;
         (create|run)
             _arguments \
@@ -484,7 +484,7 @@ __docker_subcommand () {
                 "($help -w --workdir)"{-w,--workdir=-}"[Working directory inside the container]:directory:_directories" \
                 "($help -): :__docker_images" \
                 "($help -):command: _command_names -e" \
-                "($help)*::arguments: _normal" && ret=0
+                "($help -)*::arguments: _normal" && ret=0
 
             case $state in
                 (link)
@@ -501,24 +501,24 @@ __docker_subcommand () {
             _arguments \
                 $opts_help \
                 "($help -a --all-tags)"{-a,--all-tags}"[Download all tagged images]" \
-                "($help):name:__docker_search" && ret=0
+                "($help -):name:__docker_search" && ret=0
             ;;
         (push)
             _arguments \
                 $opts_help \
-                "($help): :__docker_images" && ret=0
+                "($help -): :__docker_images" && ret=0
             ;;
         (rename)
             _arguments \
                 $opts_help \
-                "($help):old name:__docker_containers" \
-                "($help):new name: " && ret=0
+                "($help -):old name:__docker_containers" \
+                "($help -):new name: " && ret=0
             ;;
         (save)
             _arguments \
                 $opts_help \
                 "($help -o --output)"{-o,--output=-}"[Write to file]:file:_files" \
-                "($help)*: :__docker_images" && ret=0
+                "($help -)*: :__docker_images" && ret=0
             ;;
         (search)
             _arguments \
@@ -526,12 +526,12 @@ __docker_subcommand () {
                 "($help)--automated[Only show automated builds]" \
                 "($help)--no-trunc[Do not truncate output]" \
                 "($help -s --stars)"{-s,--stars=-}"[Only display with at least X stars]:stars:(0 10 100 1000)" \
-                "($help):term: " && ret=0
+                "($help -):term: " && ret=0
             ;;
         (wait)
             _arguments \
                 $opts_help \
-                "($help)*:containers:__docker_runningcontainers" && ret=0
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
         (help)
             _arguments ":subcommand:__docker_commands" && ret=0
