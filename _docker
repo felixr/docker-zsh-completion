@@ -298,12 +298,6 @@ __docker_subcommand () {
                 "($help -q --quiet)"{-q,--quiet}"[Only show numeric IDs]" \
                 "($help): :__docker_repositories" && ret=0
             ;;
-        (inspect)
-            _arguments \
-                $opts_help \
-                "($help -f --format=-)"{-f,--format=-}"[Format the output using the given go template]:template: " \
-                "($help)*:containers:__docker_containers" && ret=0
-            ;;
         (import)
             _arguments \
                 $opts_help \
@@ -312,18 +306,11 @@ __docker_subcommand () {
             ;;
         (info)
             ;;
-        (import)
+        (inspect)
             _arguments \
                 $opts_help \
-                "($help):URL:(- http:// file://)" \
-                "($help): :__docker_repositories_with_tags" && ret=0
-            ;;
-        (insert)
-            _arguments \
-                $opts_help \
-                "($help)1:containers:__docker_containers" \
-                "($help)2:URL:(http:// file://)" \
-                "($help)3:file:_files" && ret=0
+                "($help -f --format=-)"{-f,--format=-}"[Format the output using the given go template]:template: " \
+                "($help)*:containers:__docker_containers" && ret=0
             ;;
         (kill)
             _arguments \
