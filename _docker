@@ -39,6 +39,7 @@
 #
 
 __docker_get_containers() {
+    [[ $PREFIX = -* ]] && return 1
     integer ret=1
     local kind
     declare -a running stopped lines args
@@ -97,18 +98,22 @@ __docker_get_containers() {
 }
 
 __docker_stoppedcontainers() {
+    [[ $PREFIX = -* ]] && return 1
     __docker_get_containers stopped "$@"
 }
 
 __docker_runningcontainers() {
+    [[ $PREFIX = -* ]] && return 1
     __docker_get_containers running "$@"
 }
 
 __docker_containers () {
+    [[ $PREFIX = -* ]] && return 1
     __docker_get_containers all "$@"
 }
 
 __docker_images () {
+    [[ $PREFIX = -* ]] && return 1
     integer ret=1
     declare -a images
     images=(${${${(f)"$(_call_program commands docker images)"}[2,-1]}/(#b)([^ ]##) ##([^ ]##) ##([^ ]##)*/${match[3]}:${(r:15:: :::)match[2]} in ${match[1]}})
@@ -118,6 +123,7 @@ __docker_images () {
 }
 
 __docker_repositories () {
+    [[ $PREFIX = -* ]] && return 1
     declare -a repos
     repos=(${${${(f)"$(_call_program commands docker images)"}%% *}[2,-1]})
     repos=(${repos#<none>})
@@ -125,6 +131,7 @@ __docker_repositories () {
 }
 
 __docker_repositories_with_tags() {
+    [[ $PREFIX = -* ]] && return 1
     integer ret=1
     declare -a repos onlyrepos matched
     declare m
@@ -148,6 +155,7 @@ __docker_repositories_with_tags() {
 }
 
 __docker_search() {
+    [[ $PREFIX = -* ]] && return 1
     local cache_policy
     zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
     if [[ -z "$cache_policy" ]]; then
@@ -176,7 +184,6 @@ __docker_caching_policy()
 }
 
 __docker_commands () {
-    # local -a  _docker_subcommands
     local cache_policy
 
     zstyle -s ":completion:${curcontext}:" cache-policy cache_policy
