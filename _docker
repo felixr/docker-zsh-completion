@@ -469,17 +469,17 @@ __docker_subcommand() {
                 $opts_help \
                 "($help -): :__docker_images" && ret=0
             ;;
-        (restart|stop)
-            _arguments \
-                $opts_help \
-                "($help -t --time=-)"{-t,--time=-}"[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)" \
-                "($help -)*:containers:__docker_runningcontainers" && ret=0
-            ;;
         (rename)
             _arguments \
                 $opts_help \
                 "($help -):old name:__docker_containers" \
                 "($help -):new name: " && ret=0
+            ;;
+        (restart|stop)
+            _arguments \
+                $opts_help \
+                "($help -t --time=-)"{-t,--time=-}"[Number of seconds to try to stop for before killing the container]:seconds to before killing:(1 5 10 30 60)" \
+                "($help -)*:containers:__docker_runningcontainers" && ret=0
             ;;
         (rm)
             _arguments \
