@@ -210,7 +210,6 @@ __docker_subcommand() {
     opts_help=("(: -)"{-h,--help}"[Print usage]")
     opts_cpumem=(
         "($help -c --cpu-shares)"{-c,--cpu-shares=-}"[CPU shares (relative weight)]:CPU shares:(0 10 100 200 500 800 1000)"
-        "($help)--cpuset=-[CPUs in which to allow execution]:CPU set: "
         "($help)--cgroup-parent=-[Parent cgroup for the container]:cgroup: "
         "($help)--cpu-period=-[Limit the CPU CFS (Completely Fair Scheduler) period]:CPU period: "
         "($help)--cpu-quota=-[Limit the CPU CFS (Completely Fair Scheduler) quota]:CPU quota: "
@@ -229,7 +228,7 @@ __docker_subcommand() {
         "($help)*--device=-[Add a host device to the container]:device:_files"
         "($help)*--dns=-[Set custom dns servers]:dns server: "
         "($help)*--dns-search=-[Set custom DNS search domains]:dns domains: "
-        "($help)*"{-e,--environment=-}"[Set environment variables]:environment variable: "
+        "($help)*"{-e,--env=-}"[Set environment variables]:environment variable: "
         "($help)--entrypoint=-[Overwrite the default entrypoint of the image]:entry point: "
         "($help)*--env-file=-[Read environment variables from a file]:environment file:_files"
         "($help)*--expose=-[Expose a port from the container without publishing it]: "
@@ -252,7 +251,6 @@ __docker_subcommand() {
         "($help)--privileged[Give extended privileges to this container]"
         "($help)--read-only[Mount the container's root filesystem as read only]"
         "($help)--restart=-[Restart policy]:restart policy:(no on-failure always)"
-        "($help)--rm[Remove intermediate containers when it exits]"
         "($help)*--security-opt=-[Security options]:security option: "
         "($help -t --tty)"{-t,--tty}"[Allocate a pseudo-tty]"
         "($help -u --user)"{-u,--user=-}"[Username or UID]:user:_users"
@@ -429,8 +427,8 @@ __docker_subcommand() {
             _arguments \
                 $opts_help \
                 "($help -f --follow)"{-f,--follow}"[Follow log output]" \
-                "($help -t --timestamps)"{-t,--timestamps}"[Show timestamps]" \
                 "($help -s --since)"{-s,--since=-}"[Show logs since this timestamp]:timestamp: " \
+                "($help -t --timestamps)"{-t,--timestamps}"[Show timestamps]" \
                 "($help)--tail=-[Output the last K lines]:lines:(1 10 20 50 all)" \
                 "($help -)*:containers:__docker_containers" && ret=0
             ;;
@@ -502,6 +500,7 @@ __docker_subcommand() {
                 $opts_cpumem \
                 $opts_create \
                 "($help -d --detach)"{-d,--detach}"[Detached mode: leave the container running in the background]" \
+                "($help)--rm[Remove intermediate containers when it exits]" \
                 "($help)--sig-proxy[Proxy all received signals to the process (non-TTY mode only)]" \
                 "($help -): :__docker_images" \
                 "($help -):command: _command_names -e" \
