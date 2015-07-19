@@ -602,12 +602,12 @@ _docker() {
         "($help)*--default-ulimit=-[Set default ulimit settings for containers]:ulimit: " \
         "($help -e --exec-driver)"{-e,--exec-driver=-}"[Exec driver to use]:driver:(native lxc windows)" \
         "($help)*--exec-opt=-[Set exec driver options]:exec driver options: " \
-        "($help)--exec-root=-[Root of the Docker execdriver (default: /var/run/docker)]:path:_directories" \
+        "($help)--exec-root=-[Root of the Docker execdriver]:path:_directories" \
         "($help)--fixed-cidr=-[IPv4 subnet for fixed IPs]:IPv4 subnet: " \
         "($help)--fixed-cidr-v6=-[IPv6 subnet for fixed IPs]:IPv6 subnet: " \
-        "($help  -G --group)"{-G,--group=-}"[Group for the unix socket (default: docker)]:group:_groups" \
-        "($help  -g --graph)"{-g,--graph=-}"[Root of the Docker runtime (default: /var/lib/docker)]:path:_directories" \
-        "($help  -H --host)"{-H,--host=-}"[tcp://host:port to bind/connect to]:host: " \
+        "($help -G --group)"{-G,--group=-}"[Group for the unix socket]:group:_groups" \
+        "($help -g --graph)"{-g,--graph=-}"[Root of the Docker runtime]:path:_directories" \
+        "($help -H --host)"{-H,--host=-}"[tcp://host:port to bind/connect to]:host: " \
         "($help)--icc[Enable inter-container communication]" \
         "($help)*--insecure-registry=-[Enable insecure registry communication]:registry: " \
         "($help)--ip=-[Default IP when binding container ports]" \
@@ -615,14 +615,14 @@ _docker() {
         "($help)--ip-masq[Enable IP masquerading]" \
         "($help)--iptables[Enable addition of iptables rules]" \
         "($help)--ipv6[Enable IPv6 networking]" \
-        "($help  -l --log-level)"{-l,--log-level=-}"[Set the logging level]:level:(debug info warn error fatal)" \
+        "($help -l --log-level)"{-l,--log-level=-}"[Set the logging level]:level:(debug info warn error fatal)" \
         "($help)*--label=-[Set key=value labels to the daemon]:label: " \
         "($help)--log-driver=-[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd none)" \
         "($help)*--log-opt=-[Log driver specific options]:log driver options: " \
         "($help)--mtu=-[Set the containers network MTU]:mtu:(0 576 1420 1500 9000)" \
-        "($help  -p --pidfile)"{-p,--pidfile=-}"[Path to use for daemon PID file (default: /var/run/docker.pid)]:PID file:_files" \
+        "($help -p --pidfile)"{-p,--pidfile=-}"[Path to use for daemon PID file]:PID file:_files" \
         "($help)*--registry-mirror=-[Preferred Docker registry mirror]:registry mirror: " \
-        "($help  -s --storage-driver)"{-s,--storage-driver=-}"[Storage driver to use]:driver:(aufs devicemapper btrfs zfs overlay)" \
+        "($help -s --storage-driver)"{-s,--storage-driver=-}"[Storage driver to use]:driver:(aufs devicemapper btrfs zfs overlay)" \
         "($help)--selinux-enabled[Enable selinux support]" \
         "($help)*--storage-opt=-[Set storage driver options]:storage driver options: " \
         "($help)--tls[Use TLS]" \
