@@ -203,10 +203,10 @@ __docker_commands() {
 
 __docker_subcommand() {
     local -a _command_args opts_help opts_cpumem opts_create
-    local expl help="-h --help"
+    local expl help="--help"
     integer ret=1
 
-    opts_help=("(: -)"{-h,--help}"[Print usage]")
+    opts_help=("(: -)--help[Print usage]")
     opts_cpumem=(
         "($help -c --cpu-shares)"{-c,--cpu-shares=-}"[CPU shares (relative weight)]:CPU shares:(0 10 100 200 500 800 1000)"
         "($help)--cgroup-parent=-[Parent cgroup for the container]:cgroup: "
