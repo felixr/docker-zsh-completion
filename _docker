@@ -594,6 +594,7 @@ _docker() {
         "($help)--api-cors-header=-[Set CORS headers in the remote API]:CORS headers: " \
         "($help -b --bridge)"{-b,--bridge=-}"[Attach containers to a network bridge]:bridge:_net_interfaces" \
         "($help)--bip=-[Specify network bridge IP]" \
+        "($help)--config[Location of client config files]:path:_directories" \
         "($help -D --debug)"{-D,--debug}"[Enable debug mode]" \
         "($help -d --daeamon)"{-d,--daemon}"[Enable daemon mode]" \
         "($help)--default-gateway[Container default gateway IPv4 address]:IPv4 address: " \
@@ -637,7 +638,8 @@ _docker() {
         "($help -)*:: :->option-or-argument" && ret=0
 
     local host=${opt_args[-H]}${opt_args[--host]}
-    local docker_options=${host:+--host $host}
+    local config=${opt_args[--config]}
+    local docker_options="${host:+--host $host} ${config:+--config $config}"
 
     case $state in
         (command)
