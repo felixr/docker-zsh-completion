@@ -343,6 +343,7 @@ __docker_subcommand() {
                 $opts_help \
                 "($help -d --detach)"{-d,--detach}"[Detached mode: leave the container running in the background]" \
                 "($help -i --interactive)"{-i,--interactive}"[Keep stdin open even if not attached]" \
+                "($help)--privileged[Give extended Linux capabilities to the command]" \
                 "($help -t --tty)"{-t,--tty}"[Allocate a pseudo-tty]" \
                 "($help -u --user)"{-u,--user=-}"[Username or UID]:user:_users" \
                 "($help -):containers:__docker_runningcontainers" \
