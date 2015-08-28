@@ -393,11 +393,24 @@ __docker_subcommand() {
                 $opts_help && ret=0
             ;;
         (inspect)
+            local state
             _arguments \
                 $opts_help \
                 "($help -f --format=-)"{-f,--format=-}"[Format the output using the given go template]:template: " \
                 "($help)--type=-[Return JSON for specified type]:type:(image container)" \
-                "($help -)*:containers:__docker_containers" && ret=0
+                "($help -)*: :->values" && ret=0
+
+            case $state in
+                (values)
+                    if [[ ${words[(r)--type=container]} == --type=container ]]; then
+                        __docker_containers && ret=0
+                    elif [[ ${words[(r)--type=image]} == --type=image ]]; then
+                        __docker_images && ret=0
+                    else
+                        __docker_images && __docker_containers && ret=0
+                    fi
+                    ;;
+            esac
             ;;
         (kill)
             _arguments \
