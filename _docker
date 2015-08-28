@@ -202,12 +202,12 @@ __docker_commands() {
 }
 
 __docker_subcommand() {
-    local -a _command_args opts_help opts_cpumem opts_create
+    local -a _command_args opts_help opts_cpumemlimit opts_create
     local expl help="--help"
     integer ret=1
 
     opts_help=("(: -)--help[Print usage]")
-    opts_cpumem=(
+    opts_cpumemlimit=(
         "($help -c --cpu-shares)"{-c,--cpu-shares=-}"[CPU shares (relative weight)]:CPU shares:(0 10 100 200 500 800 1000)"
         "($help)--cgroup-parent=-[Parent cgroup for the container]:cgroup: "
         "($help)--cpu-period=-[Limit the CPU CFS (Completely Fair Scheduler) period]:CPU period: "
@@ -216,6 +216,7 @@ __docker_subcommand() {
         "($help)--cpuset-mems=-[MEMs in which to allow execution]:MEMs: "
         "($help -m --memory)"{-m,--memory=-}"[Memory limit]:Memory limit: "
         "($help)--memory-swap=-[Total memory limit with swap]:Memory limit: "
+        "($help)*--ulimit=-[ulimit options]:ulimit: "
     )
     opts_create=(
         "($help -a --attach)"{-a,--attach=-}"[Attach to stdin, stdout or stderr]:device:(STDIN STDOUT STDERR)"
@@ -253,7 +254,6 @@ __docker_subcommand() {
         "($help)*--security-opt=-[Security options]:security option: "
         "($help -t --tty)"{-t,--tty}"[Allocate a pseudo-tty]"
         "($help -u --user)"{-u,--user=-}"[Username or UID]:user:_users"
-        "($help)*--ulimit=-[ulimit options]:ulimit: "
         "($help)*-v[Bind mount a volume]:volume: "
         "($help)*--volumes-from=-[Mount volumes from the specified container]:volume: "
         "($help -w --workdir)"{-w,--workdir=-}"[Working directory inside the container]:directory:_directories"
@@ -270,7 +270,7 @@ __docker_subcommand() {
         (build)
             _arguments \
                 $opts_help \
-                $opts_cpumem \
+                $opts_cpumemlimit \
                 "($help -f --file)"{-f,--file=-}"[Name of the Dockerfile]:Dockerfile:_files" \
                 "($help)--force-rm[Always remove intermediate containers]" \
                 "($help)--no-cache[Do not use cache when building the image]" \
@@ -308,7 +308,7 @@ __docker_subcommand() {
         (create)
             _arguments \
                 $opts_help \
-                $opts_cpumem \
+                $opts_cpumemlimit \
                 $opts_create \
                 "($help -): :__docker_images" \
                 "($help -):command: _command_names -e" \
@@ -511,7 +511,7 @@ __docker_subcommand() {
         (run)
             _arguments \
                 $opts_help \
-                $opts_cpumem \
+                $opts_cpumemlimit \
                 $opts_create \
                 "($help -d --detach)"{-d,--detach}"[Detached mode: leave the container running in the background]" \
                 "($help)--rm[Remove intermediate containers when it exits]" \
