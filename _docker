@@ -278,7 +278,7 @@ __docker_commands() {
         local -a lines
         lines=(${(f)"$(_call_program commands docker 2>&1)"})
         _docker_subcommands=(${${${lines[$((${lines[(i)Commands:]} + 1)),${lines[(I)    *]}]}## #}/ ##/:})
-        _docker_subcommands=($_docker_subcommands 'help:Show help for a command')
+        _docker_subcommands=($_docker_subcommands 'daemon:Enable daemon mode' 'help:Show help for a command')
         _store_cache docker_subcommands _docker_subcommands
     fi
     _describe -t docker-commands "docker command" _docker_subcommands
@@ -408,6 +408,50 @@ __docker_subcommand() {
                     ;;
             esac
 
+            ;;
+        (daemon)
+            _arguments \
+                $opts_help \
+                "($help)--api-cors-header=-[Set CORS headers in the remote API]:CORS headers: " \
+                "($help -b --bridge)"{-b,--bridge=-}"[Attach containers to a network bridge]:bridge:_net_interfaces" \
+                "($help)--bip=-[Specify network bridge IP]" \
+                "($help -D --debug)"{-D,--debug}"[Enable debug mode]" \
+                "($help)--default-gateway[Container default gateway IPv4 address]:IPv4 address: " \
+                "($help)--default-gateway-v6[Container default gateway IPv6 address]:IPv6 address: " \
+                "($help)*--dns=-[DNS server to use]:DNS: " \
+                "($help)*--dns-search=-[DNS search domains to use]" \
+                "($help)*--default-ulimit=-[Set default ulimit settings for containers]:ulimit: " \
+                "($help -e --exec-driver)"{-e,--exec-driver=-}"[Exec driver to use]:driver:(native lxc windows)" \
+                "($help)*--exec-opt=-[Set exec driver options]:exec driver options: " \
+                "($help)--exec-root=-[Root of the Docker execdriver]:path:_directories" \
+                "($help)--fixed-cidr=-[IPv4 subnet for fixed IPs]:IPv4 subnet: " \
+                "($help)--fixed-cidr-v6=-[IPv6 subnet for fixed IPs]:IPv6 subnet: " \
+                "($help -G --group)"{-G,--group=-}"[Group for the unix socket]:group:_groups" \
+                "($help -g --graph)"{-g,--graph=-}"[Root of the Docker runtime]:path:_directories" \
+                "($help -H --host)"{-H,--host=-}"[tcp://host:port to bind/connect to]:host: " \
+                "($help)--icc[Enable inter-container communication]" \
+                "($help)*--insecure-registry=-[Enable insecure registry communication]:registry: " \
+                "($help)--ip=-[Default IP when binding container ports]" \
+                "($help)--ip-forward[Enable net.ipv4.ip_forward]" \
+                "($help)--ip-masq[Enable IP masquerading]" \
+                "($help)--iptables[Enable addition of iptables rules]" \
+                "($help)--ipv6[Enable IPv6 networking]" \
+                "($help -l --log-level)"{-l,--log-level=-}"[Set the logging level]:level:(debug info warn error fatal)" \
+                "($help)*--label=-[Set key=value labels to the daemon]:label: " \
+                "($help)--log-driver=-[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd awslogs none)" \
+                "($help)*--log-opt=-[Log driver specific options]:log driver options: " \
+                "($help)--mtu=-[Set the containers network MTU]:mtu:(0 576 1420 1500 9000)" \
+                "($help -p --pidfile)"{-p,--pidfile=-}"[Path to use for daemon PID file]:PID file:_files" \
+                "($help)*--registry-mirror=-[Preferred Docker registry mirror]:registry mirror: " \
+                "($help -s --storage-driver)"{-s,--storage-driver=-}"[Storage driver to use]:driver:(aufs devicemapper btrfs zfs overlay)" \
+                "($help)--selinux-enabled[Enable selinux support]" \
+                "($help)*--storage-opt=-[Set storage driver options]:storage driver options: " \
+                "($help)--tls[Use TLS]" \
+                "($help)--tlscacert=-[Trust certs signed only by this CA]:PEM file:_files -g "*.(pem|crt)"" \
+                "($help)--tlscert=-[Path to TLS certificate file]:PEM file:_files -g "*.(pem|crt)"" \
+                "($help)--tlskey=-[Path to TLS key file]:Key file:_files -g "*.(pem|key)"" \
+                "($help)--tlsverify[Use TLS and verify the remote]" \
+                "($help)--userland-proxy[Use userland proxy for loopback traffic]" && ret=0
             ;;
         (diff)
             _arguments \
@@ -705,42 +749,10 @@ _docker() {
 
     _arguments -C \
         "(: -)"{-h,--help}"[Print usage]" \
-        "($help)--api-cors-header=-[Set CORS headers in the remote API]:CORS headers: " \
-        "($help -b --bridge)"{-b,--bridge=-}"[Attach containers to a network bridge]:bridge:_net_interfaces" \
-        "($help)--bip=-[Specify network bridge IP]" \
         "($help)--config[Location of client config files]:path:_directories" \
         "($help -D --debug)"{-D,--debug}"[Enable debug mode]" \
-        "($help -d --daeamon)"{-d,--daemon}"[Enable daemon mode]" \
-        "($help)--default-gateway[Container default gateway IPv4 address]:IPv4 address: " \
-        "($help)--default-gateway-v6[Container default gateway IPv6 address]:IPv6 address: " \
-        "($help)*--dns=-[DNS server to use]:DNS: " \
-        "($help)*--dns-search=-[DNS search domains to use]" \
-        "($help)*--default-ulimit=-[Set default ulimit settings for containers]:ulimit: " \
-        "($help -e --exec-driver)"{-e,--exec-driver=-}"[Exec driver to use]:driver:(native lxc windows)" \
-        "($help)*--exec-opt=-[Set exec driver options]:exec driver options: " \
-        "($help)--exec-root=-[Root of the Docker execdriver]:path:_directories" \
-        "($help)--fixed-cidr=-[IPv4 subnet for fixed IPs]:IPv4 subnet: " \
-        "($help)--fixed-cidr-v6=-[IPv6 subnet for fixed IPs]:IPv6 subnet: " \
-        "($help -G --group)"{-G,--group=-}"[Group for the unix socket]:group:_groups" \
-        "($help -g --graph)"{-g,--graph=-}"[Root of the Docker runtime]:path:_directories" \
         "($help -H --host)"{-H,--host=-}"[tcp://host:port to bind/connect to]:host: " \
-        "($help)--icc[Enable inter-container communication]" \
-        "($help)*--insecure-registry=-[Enable insecure registry communication]:registry: " \
-        "($help)--ip=-[Default IP when binding container ports]" \
-        "($help)--ip-forward[Enable net.ipv4.ip_forward]" \
-        "($help)--ip-masq[Enable IP masquerading]" \
-        "($help)--iptables[Enable addition of iptables rules]" \
-        "($help)--ipv6[Enable IPv6 networking]" \
         "($help -l --log-level)"{-l,--log-level=-}"[Set the logging level]:level:(debug info warn error fatal)" \
-        "($help)*--label=-[Set key=value labels to the daemon]:label: " \
-        "($help)--log-driver=-[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd awslogs none)" \
-        "($help)*--log-opt=-[Log driver specific options]:log driver options: " \
-        "($help)--mtu=-[Set the containers network MTU]:mtu:(0 576 1420 1500 9000)" \
-        "($help -p --pidfile)"{-p,--pidfile=-}"[Path to use for daemon PID file]:PID file:_files" \
-        "($help)*--registry-mirror=-[Preferred Docker registry mirror]:registry mirror: " \
-        "($help -s --storage-driver)"{-s,--storage-driver=-}"[Storage driver to use]:driver:(aufs devicemapper btrfs zfs overlay)" \
-        "($help)--selinux-enabled[Enable selinux support]" \
-        "($help)*--storage-opt=-[Set storage driver options]:storage driver options: " \
         "($help)--tls[Use TLS]" \
         "($help)--tlscacert=-[Trust certs signed only by this CA]:PEM file:_files -g "*.(pem|crt)"" \
         "($help)--tlscert=-[Path to TLS certificate file]:PEM file:_files -g "*.(pem|crt)"" \
