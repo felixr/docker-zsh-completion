@@ -83,12 +83,13 @@ __docker_get_containers() {
     for line in $lines; do
         names=(${(ps:,:)${${line[${begin[NAMES]},${end[NAMES]}]}%% *}})
         for name in $names; do
+            name=${name#*/}     # With Swarm, names can contain /
             s="${name}:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
             s="$s, ${${${line[${begin[IMAGE]},${end[IMAGE]}]}/:/\\:}%% ##}"
             if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
-                stopped=($stopped ${s#*/})
+                stopped=($stopped $s)
             else
-                running=($running ${s#*/})
+                running=($running $s)
             fi
         done
     done
