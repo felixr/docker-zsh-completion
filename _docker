@@ -48,7 +48,7 @@ __docker_get_containers() {
     shift
     [[ $kind = (stopped|all) ]] && args=($args -a)
 
-    lines=(${(f)"$(_call_program commands docker $docker_options ps $args)"})
+    lines=(${(f)"$(_call_program commands docker $docker_options ps --no-trunc $args)"})
 
     # Parse header line to find columns
     local i=1 j=1 k header=${lines[1]}
@@ -67,7 +67,7 @@ __docker_get_containers() {
     local line
     local s
     for line in $lines; do
-        s="${line[${begin[CONTAINER ID]},${end[CONTAINER ID]}]%% ##}"
+        s="${${line[${begin[CONTAINER ID]},${end[CONTAINER ID]}]%% ##}[0,12]}"
         s="$s:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
         s="$s, ${${${line[${begin[IMAGE]},${end[IMAGE]}]}/:/\\:}%% ##}"
         if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
