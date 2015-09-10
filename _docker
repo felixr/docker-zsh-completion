@@ -60,6 +60,7 @@ __docker_get_containers() {
         begin[${header[$i,$((j-1))]}]=$i
         end[${header[$i,$((j-1))]}]=$k
     done
+    end[${header[$i,$((j-1))]}]=-1 # Last column, should go to the end of the line
     lines=(${lines[2,-1]})
 
     # Container ID
@@ -80,7 +81,7 @@ __docker_get_containers() {
     local name
     local -a names
     for line in $lines; do
-        names=(${(ps:,:)${${line[${begin[NAMES]},-1]}%% *}})
+        names=(${(ps:,:)${${line[${begin[NAMES]},${end[NAMES]}]}%% *}})
         for name in $names; do
             s="${name}:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
             s="$s, ${${${line[${begin[IMAGE]},${end[IMAGE]}]}/:/\\:}%% ##}"
