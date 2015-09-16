@@ -77,11 +77,18 @@ __docker_get_containers() {
         fi
     done
 
-    # Names: we only display the last one (automatically assigned or
-    # chosen by the user). All other names are generated and may
-    # clutter the completion.
+    # Names: we only display the one without slash. All other names
+    # are generated and may clutter the completion. However, with
+    # Swarm, all names may be prefixed by the swarm node name.
+    local -a names
     for line in $lines; do
-        s="${${${${line[${begin[NAMES]},${end[NAMES]}]}%% *}##*,}#*/}"
+        names=(${(ps:,:)${${line[${begin[NAMES]},${end[NAMES]}]}%% *}})
+        # First step: find a common prefix and strip it (swarm node case)
+        (( ${#${(u)names%%/*}} == 1 )) && names=${names#${names[1]%%/*}/}
+        # Second step: only keep the first name without a /
+        s=${${names:#*/*}[1]}
+        # If no name, well give up.
+        (( $#s != 0 )) || continue
         s="$s:${(l:15:: :::)${${line[${begin[CREATED]},${end[CREATED]}]/ ago/}%% ##}}"
         s="$s, ${${${line[${begin[IMAGE]},${end[IMAGE]}]}/:/\\:}%% ##}"
         if [[ ${line[${begin[STATUS]},${end[STATUS]}]} = Exit* ]]; then
