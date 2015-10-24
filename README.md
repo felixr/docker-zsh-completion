@@ -6,15 +6,30 @@ A [zsh](http://zsh.org) completion for [docker](http://docker.io).
 How to Install
 --------------
 
-Drop the _docker file into your /.zsh/completion directory.
-Then reset zsh.
+For [Oh My Zsh](http://ohmyz.sh/) users:
+```sh
+mkdir -p ~/.oh-my-zsh/plugins/docker/
+curl -fLo ~/.oh-my-zsh/plugins/docker/_docker https://raw.github.com/felixr/docker-zsh-completion/master/_docker
+```
+And then in your `~/.zshrc` file, add `docker` to the plugins list. Then run `exec zsh` to restart zsh.
+
+For [Prezto](https://github.com/sorin-ionescu/prezto) users:
+```sh
+curl -fLo ~/.zprezto/modules/completion/external/src/_docker \
+  https://raw.github.com/felixr/docker-zsh-completion/master/_docker
+exec zsh
+```
+This assumes you have the `completions` module enabled in your `~/.zpreztorc` file.
+
+For other Zsh users:
+Drop the `_docker` file into your `~/.zsh/completion` directory, then reset zsh:
 
 ```sh
 mkdir -p ~/.zsh/completion
-curl -L https://raw.github.com/felixr/docker-zsh-completion/master/_docker >  ~/.zsh/completion/_docker
+curl -fLo ~/.zsh/completion/_docker https://raw.github.com/felixr/docker-zsh-completion/master/_docker
 exec zsh
 ```
- 
+This assumes `~/.zsh/completion` is in Zsh's `$fpath` [parameter](http://zsh.sourceforge.net/Doc/Release/Parameters.html#index-fpath). Run `echo $fpath` to check.
 
 
 Contributors
