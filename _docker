@@ -267,12 +267,13 @@ __docker_network_subcommand() {
                 "($help)*--ip-range=[Allocate container ip from a sub-range]:IP/mask: " \
                 "($help)*--gateway=[ipv4 or ipv6 Gateway for the master subnet]:IP: " \
                 "($help)*--aux-address[Auxiliary ipv4 or ipv6 addresses used by network driver]:key=IP: " \
+                "($help)*"{-o=,--opt=}"[Set driver specific options]:key=value: " \
                 "($help -)1:Network Name: " && ret=0
             ;;
         (inspect|rm)
             _arguments $(__docker_arguments) \
                 $opts_help \
-                "($help -):network:__docker_networks" && ret=0
+                "($help -)*:network:__docker_networks" && ret=0
             ;;
         (ls)
             _arguments $(__docker_arguments) \
@@ -344,7 +345,7 @@ __docker_volume_subcommand() {
                 $opts_help \
                 "($help -d --driver)"{-d=,--driver=}"[Specify volume driver name]:Driver name: " \
                 "($help)--name=[Specify volume name]" \
-                "($help -o --opt)*"{-o=,--opt=}"[Set driver specific options]:Driver option: " && ret=0
+                "($help)*"{-o=,--opt=}"[Set driver specific options]:Driver option: " && ret=0
             ;;
         (inspect)
             _arguments $(__docker_arguments) \
@@ -355,7 +356,7 @@ __docker_volume_subcommand() {
         (ls)
             _arguments $(__docker_arguments) \
                 $opts_help \
-                "($help -f --filter)*"{-f=,--filter=}"[Provide filter values (i.e. 'dangling=true')]:filter: " \
+                "($help)*"{-f=,--filter=}"[Provide filter values (i.e. 'dangling=true')]:filter: " \
                 "($help -q --quiet)"{-q,--quiet}"[Only display volume names]" && ret=0
             ;;
         (rm)
@@ -435,7 +436,7 @@ __docker_subcommand() {
         "($help)--kernel-memory[Kernel memory limit in bytes.]:Memory limit: "
         "($help)*--link=[Add link to another container]:link:->link"
         "($help)*"{-l=,--label=}"[Set meta data on a container]:label: "
-        "($help)--log-driver=[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd awslogs none)"
+        "($help)--log-driver=[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd awslogs splunk none)"
         "($help)*--log-opt=[Log driver specific options]:log driver options: "
         "($help)*--lxc-conf=[Add custom lxc options]:lxc options: "
         "($help)--mac-address=[Container MAC address]:MAC address: "
@@ -475,14 +476,14 @@ __docker_subcommand() {
                 "($help)--pull[Attempt to pull a newer version of the image]" \
                 "($help -q --quiet)"{-q,--quiet}"[Suppress verbose build output]" \
                 "($help)--rm[Remove intermediate containers after a successful build]" \
-                "($help -t --tag)"{-t=,--tag=}"[Repository, name and tag for the image]: :__docker_repositories_with_tags" \
+                "($help -t --tag)*"{-t=,--tag=}"[Repository, name and tag for the image]: :__docker_repositories_with_tags" \
                 "($help -):path or URL:_directories" && ret=0
             ;;
         (commit)
             _arguments $(__docker_arguments) \
                 $opts_help \
                 "($help -a --author)"{-a=,--author=}"[Author]:author: " \
-                "($help -c --change)*"{-c=,--change=}"[Apply Dockerfile instruction to the created image]:Dockerfile:_files" \
+                "($help)*"{-c=,--change=}"[Apply Dockerfile instruction to the created image]:Dockerfile:_files" \
                 "($help -m --message)"{-m=,--message=}"[Commit message]:message: " \
                 "($help -p --pause)"{-p,--pause}"[Pause container during commit]" \
                 "($help -):container:__docker_containers" \
@@ -557,7 +558,7 @@ __docker_subcommand() {
                 "($help)--ipv6[Enable IPv6 networking]" \
                 "($help -l --log-level)"{-l=,--log-level=}"[Set the logging level]:level:(debug info warn error fatal)" \
                 "($help)*--label=[Set key=value labels to the daemon]:label: " \
-                "($help)--log-driver=[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd awslogs none)" \
+                "($help)--log-driver=[Default driver for container logs]:Logging driver:(json-file syslog journald gelf fluentd awslogs splunk none)" \
                 "($help)*--log-opt=[Log driver specific options]:log driver options: " \
                 "($help)--mtu=[Set the containers network MTU]:mtu:(0 576 1420 1500 9000)" \
                 "($help -p --pidfile)"{-p=,--pidfile=}"[Path to use for daemon PID file]:PID file:_files" \
@@ -650,7 +651,7 @@ __docker_subcommand() {
         (import)
             _arguments $(__docker_arguments) \
                 $opts_help \
-                "($help -c --change)*"{-c=,--change=}"[Apply Dockerfile instruction to the created image]:Dockerfile:_files" \
+                "($help)*"{-c=,--change=}"[Apply Dockerfile instruction to the created image]:Dockerfile:_files" \
                 "($help -m --message)"{-m=,--message=}"[Set commit message for imported image]:message: " \
                 "($help -):URL:(- http:// file://)" \
                 "($help -): :__docker_repositories_with_tags" && ret=0
