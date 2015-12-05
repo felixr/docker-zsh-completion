@@ -21,6 +21,11 @@ exec zsh
 ```
 This assumes you have the `completions` module enabled in your `~/.zpreztorc` file.
 
+With [zplug](https://github.com/b4b4r07/zplug):
+```sh
+zplug "felixr/docker-zsh-completion"
+```
+
 For other Zsh users:
 Drop the `_docker` file into your `~/.zsh/completion` directory, then reset zsh:
 
