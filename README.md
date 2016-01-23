@@ -1,7 +1,11 @@
 docker-zsh-completion
 =====================
 
-A [zsh](http://zsh.org) completion for [docker](http://docker.io).
+A [zsh](http://zsh.org) completion for
+[docker](http://docker.io). This completion has been merged into
+docker official repository and receives various updates. This
+repository is kept up-to-date but, except for one small detail, there
+should not be no difference.
  
 How to Install
 --------------
