@@ -48,7 +48,12 @@ Contributors
 * [vincentbernat](http://github.com/vincentbernat)
 * [sdurrheimer](https://github.com/sdurrheimer)
 
-And many others as most commits now come directly from Docker.
+And many others as most commits now come directly from Docker. Patches
+are applied this way:
+
+    $ cd docker/contrib/completion/zsh
+    $ git format-patch --stdout -1 d736a9d2c3758fcc4eac0b62e9c7b128388021c1 -- ./_docker | \
+        (cd ~/.zsh/third-party/docker-zsh-completion ; git am -p4 )
 
 License (BSD License)
 ------------------------------
