@@ -46,7 +46,9 @@ Contributors
 
 * [felixr](http://github.com/felixr)
 * [vincentbernat](http://github.com/vincentbernat)
+* [sdurrheimer](https://github.com/sdurrheimer)
 
+And many others as most commits now come directly from Docker.
 
 License (BSD License)
 ------------------------------
