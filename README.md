@@ -1,11 +1,17 @@
 docker-zsh-completion
 =====================
 
-A [zsh](http://zsh.org) completion for
-[docker](http://docker.io). This completion has been merged into
-docker official repository and receives various updates. This
-repository is kept up-to-date but, except for one small detail, there
-should not be no difference.
+A [zsh](http://zsh.org) completion for [Docker](http://docker.io).
+
+**Depraction notice**: This repository is not kept up-to-date any more. Please,
+switch to the [ZSH completion from Docker](https://github.com/docker/docker/blob/master/contrib/completion/zsh/_docker)
+directly. To keep the same behavior as previously, you may want to add the following
+code to your `~/.zshrc`:
+
+```sh
+zstyle ':completion:*:*:docker:*' option-stacking yes
+zstyle ':completion:*:*:docker-*:*' option-stacking yes
+```
  
 How to Install
 --------------
