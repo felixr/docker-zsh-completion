@@ -29,7 +29,7 @@ curl -fLo ~/.zprezto/modules/completion/external/src/_docker \
   https://raw.github.com/felixr/docker-zsh-completion/master/_docker
 exec zsh
 ```
-This assumes you have the `completions` module enabled in your `~/.zpreztorc` file.
+This assumes you have the `completion` module enabled in your `~/.zpreztorc` file.
 
 With [zplug](https://github.com/b4b4r07/zplug):
 ```sh
