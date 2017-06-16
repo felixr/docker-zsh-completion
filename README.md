@@ -4,7 +4,7 @@ docker-zsh-completion
 A [zsh](http://zsh.org) completion for [Docker](http://docker.io).
 
 **Deprecation notice**: This repository is not kept up-to-date any more. Please,
-switch to the [ZSH completion from Docker](https://github.com/docker/docker/blob/master/contrib/completion/zsh/_docker)
+switch to the [ZSH completion from Docker](https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker)
 directly. To keep the same behavior as previously, you may want to add the following
 code to your `~/.zshrc`:
 
